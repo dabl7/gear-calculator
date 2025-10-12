@@ -94,33 +94,6 @@ def calculate(t,d,m,o):
     
     if odd==True:print("\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if d==0:
     print("ERROR: Invalid diameter (Diameter: "+str(d)+")")
     exit()
