@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Gear Calculator</title>
+</head>
+<body>
+  <h1>Gear Calculator</h1>
+  <label>Gear type:
+    <select id="type">
+      <option value="external">external</option>
+      <option value="internal">internal</option>
+    </select>
+  </label><br>
+  <label>Gear diameter (studs): <input id="d" type="number" step="any" value="20"></label><br>
+  <label>Teeth size (module): <input id="m" type="number" step="any" value="1"></label><br>
+  <label id="thickness-label" style="display:none;">Outside thickness (studs): <input id="thickness" type="number" step="any" value="1"></label><br>
+  <button id="calc">Calculate</button>
+  <button id="reset">Reset</button>
+  <p id="error" style="color:red"></p>
+  <pre id="output">(Press Calculate)</pre>
+
+  <script>
+	//gear calculator 2025 Oct 12 (by @dabl2928 on youtube)
+
+    function getEl(id){return document.getElementById(id);}
+    function roundTo(n,d=2){const p=Math.pow(10,d);return Math.round(n*p)/p;}
+    function isNearlyInteger(x,e=1e-9){return Math.abs(Math.round(x)-x)<e;}
+
+    function showError(msg){getEl('error').textContent=msg;}
+    function clearError(){getEl('error').textContent='';}
+
+    function calculate(){
+      clearError();
+      const t=getEl('type').value;
+      const d=parseFloat(getEl('d').value);
+      const m=parseFloat(getEl('m').value);
+      const thickness=parseFloat(getEl('thickness').value);
+
+      if(!d){showError('Invalid diameter');return;}
+      if(!m){showError('Invalid module');return;}
+
+      const n_teeth=d/m;
+      if(n_teeth<4){showError('Not enough teeth');return;}
+      if(!isNearlyInteger(n_teeth)){showError('Teeth isnt a full number');return;}
+      if(t!=='internal'&&t!=='external'){showError('Invalid gear type');return;}
+
+      const odd=(Math.round(n_teeth)%2)===1;
+      let inner_d,outer_d,circle_piece;
+
+      if(t==='external'){
+        inner_d=d-2.4*m;
+	outer_d=d+2*m;
+	circle_piece=roundTo(inner_d*Math.tan(Math.PI/n_teeth));
+      }else{
+        inner_d=d+2.4*m;
+	outer_d=d+2.4*m+2*thickness
+	;circle_piece=roundTo(outer_d*Math.tan(Math.PI/n_teeth));
+      }
+
+      let tooth_height;
+      if(t==='internal') tooth_height=roundTo(0.6*2.2*m); // 0.6 is the correction (makes it run smooth)
+      else tooth_height=roundTo(2.2*m);
+
+      const nt=Math.round(n_teeth);
+
+      let g;
+
+      if(nt<=5)
+	g=0.6;
+      else if(nt<=7)
+	g=0.7;
+      else if(nt<=12)
+	g=0.8;
+      else if(nt<=22)
+	g=0.9;
+      else if(nt<=57)
+	g=1;
+      else 
+	g=1.1;
+
+      const tooth_arc_length=roundTo(m*g);
+      const deg=roundTo(360/n_teeth);
+
+      if(t==='internal') AIS0=roundTo(inner_d/2+1);
+      else AIS0=roundTo(inner_d/2-1);
+
+      const AIS1=roundTo((circle_piece-2)/2);
+      const AIS2=roundTo((tooth_arc_length-2)/2);
+      const AIS3=roundTo(tooth_height-2);
+
+      //#########################################
+      let out=`========GEAR-INFO========
+Type: ${t}
+Number of teeth: ${nt}
+Module (teeth size): ${m}\n\n`;
+
+		if(odd) //ODDS
+		      if (t==='internal') out+=`Inner radius: ${roundTo(inner_d/2)} studs  (move for: ${roundTo(AIS0)})\nOuter diameter: ${roundTo(outer_d)} studs\n`;
+
+		      else out+=`Inner radius: ${roundTo(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;
+		else //EVEN
+			if (t==='internal') out+=`Inner diameter: ${roundTo(inner_d)} studs  (move for: ${AIS0})\nOuter diameter: ${roundTo(outer_d)} studs\n`;
+		        else out+=`Inner diameter: ${roundTo(inner_d)} studs  (amount in scale: ${AIS0})\n`;
+
+out+=`Circle piece: ${circle_piece}  (amount in scale: ${AIS1})
+Tooth length: ${tooth_arc_length}  (amount in scale: ${AIS2})
+Tooth height: ${tooth_height}  (amount in scale: ${AIS3})\n`;
+
+out+=`\nDegrees for rotating and cloning: ${deg}\n`;
+
+out+='\n==========CHECK-DIMENSIONS==========';
+out+=`\nTooth part dimensions: ${roundTo(2+2*AIS2)} x ${tooth_height}\n`;
+
+if(odd)
+	if (t===`internal`)
+		out+=`Other part dimensions: ${roundTo(2+2*AIS1)} x ${thickness}\n`
+	else
+		out+=`Other part dimensions: ${roundTo(2+2*AIS1)} x ${inner_d/2}\n`
+else
+	if (t==='internal')
+                out+=`Other part dimensions: ${roundTo(2+2*AIS1)} x ${thickness}\n`
+	else
+		out+=`Other part dimensions: ${roundTo(2+2*AIS1)} x ${inner_d}\n`
+
+
+if(odd)out+='\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)';
+
+    getEl('output').textContent=out;}
+    getEl('calc').onclick=calculate;
+    getEl('reset').onclick=()=>{getEl('type').value='external';getEl('d').value=20;getEl('m').value=1;getEl('thickness').value=1;clearError();getEl('output').textContent='press calculate';getEl('thickness-label').style.display='none';};
+    getEl('type').onchange=e=>{getEl('thickness-label').style.display=e.target.value==='internal'?'block':'none';};
+  </script>
+</body>
+</html>
