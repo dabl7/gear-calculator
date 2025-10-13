@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Planetary Gear Set Calculator</title>
+</head>
+<body>
+  <h1>Planetary Gear Set Calculator</h1>
+  <label>Sun gear teeth: <input id="s" type="number" step="any" value="20"></label><br>
+  <label>Ring gear teeth: <input id="r" type="number" step="any" value="40"></label><br>
+  <label>Number of planet gears: <input id="n_p" type="number" step="any" value="4"></label><br>
+  <button id="calc">Calculate</button>
+  <button id="reset">Reset</button>
+  <pre id="output">input data and press calculate</pre>
+
+  <script>
+	  //planetary gear set calculator 2025 Oct 13 (by @dabl2928 on youtube)
+	function input(id){return document.getElementById(id);}
+	function calculate(){
+	const s = parseFloat(input("s").value);
+	const r = parseFloat(input("r").value);
+	const n_p = parseFloat(input("n_p").value);
+	
+	
+	const valid = (s < r && Math.round(s / n_p) - s / n_p === 0 && Math.round(r / n_p) - r / n_p === 0);
+
+	let out=''
+	if(valid) {out="INFO: valid planetary gear set\n\n"} else {out="WARNING: planetary gear set cannot mesh (calculating ratios anyway)\n\n"}
+
+	const R = (-r)/s
+
+	const f_c=(1/R) //carrier fixed
+	out+="Carrier fixed:\n"
+	out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
+	out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
+
+	const f_s=(R-1) //sun fixed
+	out+="Sun fixed:\n"
+        out+=` -Carrier as input (outputs with ring): ${1/f_s} torque multiplication\n`                  
+        out+=` -Ring as input (outputs with carrier): ${f_s} torque multiplication\n`
+
+	const f_r=(-1)*(R-1) //ring gear fixed
+	out+="Ring fixed:\n"
+        out+=` -Sun as input (outputs with carrier): ${f_r} torque multiplication\n`                  
+	out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
+
+	input("output").textContent=out;}
+
+	input("calc").onclick=calculate;
+	input('reset').onclick=()=>{input('s').value=20;input('r').value=40;input('n_p').value=4;input('output').textContent='input data and press calculate';};
+  </script>
+</body>
+</html>
