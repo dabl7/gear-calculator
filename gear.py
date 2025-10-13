@@ -1,4 +1,4 @@
-#gear calculator 2025 Oct 12 (by @dabl2928 on youtube)
+#gear calculator 2025 Oct 13 (by @dabl2928 on youtube)
 import math
 
 t=input("Gear type (internal/external): ")
@@ -41,7 +41,7 @@ def calculate(t,d,m,o):
         g= 1
     else:
         g = 1.1
-    
+
     tooth_arc_length = round(m*g,2)
     deg = round(360/n_teeth,2)
 
@@ -62,17 +62,19 @@ def calculate(t,d,m,o):
 
     if odd==True:
         if t.lower()=="internal":
-            print("Inner radius: "+str(inner_d/2)+" studs  (move for: "+str(AIS0)+")")
+            print("Inner radius: "+str(round(inner_d/2,2))+" studs  (move for: "+str(AIS0)+")")
             print("Outer diameter: "+str(outer_d)+" studs  ")
+            print("Thickness: "+str(thickness)+" studs  (amount in scale: "+str(round(thickness-2,2))+")")
         else:
-            print("Inner radius: "+str(inner_d/2)+" studs  (amount in scale: "+str(AIS0)+")")
+            print("Inner radius: "+str(round(inner_d/2),2)+" studs  (amount in scale: "+str(AIS0)+")")
 
     else: #EVEN
         if t.lower()=="internal":
-            print("Inner diameter: "+str(inner_d)+" studs  (move for: "+str(AIS0)+")")
+            print("Inner diameter: "+str(inner_d)+" studs  (move for: "+str(AIS0)+" on both sides)")
             print("Outer diameter: "+str(outer_d)+" studs")
+            print("Thickness: "+str(thickness)+" studs  (amount in scale: "+str(round(thickness-2,2))+")")
         else:
-            print("Inner diameter: "+str(inner_d)+" studs  (amount in scale: "+str(AIS0)+")")
+            print("Inner diameter: "+str(inner_d)+" studs  (amount in scale: "+str(AIS0)+" for both sides)")
 
     print("Circle piece: "+str(circle_piece)+" studs  (amount in scale: "+str(AIS1)+")")
     print("Tooth length: "+str(tooth_arc_length)+" studs  (amount in scale: "+str(AIS2)+")")
@@ -91,7 +93,7 @@ def calculate(t,d,m,o):
             print("Other part dimensions: "+str(round(2+2*AIS1,2))+" x "+str(thickness))
         else:          #EXTERNAL   EVEN
             print("Other part dimensions: "+str(round(2+2*AIS1,2))+" x "+str(inner_d))
-    
+
     if odd==True:print("\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)")
 
 if d==0:
