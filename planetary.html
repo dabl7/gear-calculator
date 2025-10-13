@@ -35,7 +35,7 @@
 	out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
 	out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
 
-	const f_s=(R-1) //sun fixed
+	const f_s=(R-1)/R //sun fixed
 	out+="Sun fixed:\n"
         out+=` -Carrier as input (outputs with ring): ${1/f_s} torque multiplication\n`                  
         out+=` -Ring as input (outputs with carrier): ${f_s} torque multiplication\n`
