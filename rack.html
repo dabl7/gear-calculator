@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gear rack Calculator</title>
+</head>
+<body style=background-color:#707070>
+  <h1>Gear Rack Calculator</h1>
+  <label>Teeth size (module): <input id="m" type="number" step="any" value="1"></label><br>
+  <button id="calc">Calculate</button>
+  <button id="reset">Reset</button>
+  <pre id="output">input data and press calculate</pre>
+
+  <script>
+        //gear rack calculator 2025 Oct 31 (by @dabl2928 on youtube)
+        function input(id){return document.getElementById(id);}
+	function round(n,d=2){const p=Math.pow(10,d);return Math.round(n*p)/p;}
+        function calculate(){
+
+	pi = 3.141592653589793;
+        m = parseFloat(input("m").value);
+        
+	valid = (m != 0 && m>0);
+
+	clone_distance=round(m*pi);
+	tooth_height = round(2.2*m);
+	tooth_arc_length = round(1.1*m);
+	slope_length = round(tooth_height/Math.cos(12*pi/180));
+
+	AIS0 = round(tooth_height-2);
+	AIS1 = round(tooth_arc_length/2-1);
+	AIS2 = round(slope_length-tooth_height);
+	
+	p_x = round(2+2*AIS1);
+	p_y = round(2+AIS0);
+	a_x = round(p_x);
+	a_y = round(p_y+AIS2);
+
+	let out = ''
+
+	if (valid){
+		out+='========RACK-INFO========\n';
+		out+=`Module (teeth size): ${m}\n\n`;
+		out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
+		out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
+		out+=`Angle: 12 (use mirror)\n`;
+		out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
+		out+=`Clone distance: ${clone_distance}\n`;
+		out+=`\n==========CHECK-DIMENSIONS==========\n`;
+		out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
+		out+=`Angled pieces: ${a_x} x ${a_y}`;
+	} else{
+		out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
+	}
+	
+        input("output").textContent=out;}
+
+        input("calc").onclick=calculate;
+        input('reset').onclick=()=>{input('m').value=1;input('output').textContent='input data and press calculate';};
+  </script>
+</body>
+</html>
