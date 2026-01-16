@@ -377,6 +377,8 @@ elif mode=="worm":
         print(f"\nERROR: Bigger diameter or smaller module (inner diameter becomes {d-2.4*m:.2f})")
     elif ((d-2.4*m)*math.tan(math.pi/(360/q)))<0.05:
         print(f"\nERROR: Bigger diameter or more degree for rotating (circle piece dimensions becomes {(d-2.4*m)*math.tan(math.pi/(360/q)):.2f})")
+    elif ((180/math.pi*math.atan(m/(d-2.4*m))>30)):
+        print(f"\nERROR: Helix angle is too steep: {180/math.pi*math.atan(m/(d-2.4*m)):.2f} (increase diameter/decrease module)")
     else:
         worm(d,m,q)
 
