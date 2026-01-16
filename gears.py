@@ -373,6 +373,10 @@ elif mode=="worm":
         print(f"\nERROR: Invalid module ({m})")
     elif q!=5 and q!=15:
         print(f"\nERROR: Invalid degrees, you can choose between 5 and 15 ({q})")
+    elif (d-2.4*m)<=0:
+        print(f"\nERROR: Bigger diameter or smaller module (inner diameter becomes {d-2.4*m:.2f})")
+    elif ((d-2.4*m)*math.tan(math.pi/(360/q)))<0.05:
+        print(f"\nERROR: Bigger diameter or more degree for rotating (circle piece dimensions becomes {(d-2.4*m)*math.tan(math.pi/(360/q)):.2f})")
     else:
         worm(d,m,q)
 
