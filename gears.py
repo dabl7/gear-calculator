@@ -119,13 +119,13 @@ def worm(d,m,q):
     tooth_width = round(1.1*m,2)
     AIS_4 = round(tooth_width/2-1,2) #1.1m tooth width thing
 
-    s_x=2+AIS_2
-    s_y=2+2*AIS_4
-    s_z=2+2*AIS_3
+    s_x=round(2+AIS_2,2)
+    s_y=round(2+2*AIS_4,2)
+    s_z=round(2+2*AIS_3,2)
 
-    t_x=2+2*AIS_0
-    t_y=2+2*AIS_1
-    t_z=pitch
+    t_x=round(2+2*AIS_0,2)
+    t_y=round(2+2*AIS_1,2)
+    t_z=round(pitch,2)
 
     spiral_block = s_x*s_y*s_z/8
     stem_block = t_x*t_y*t_z/8
