@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Combined Gears Calculator BABFT</title>
+</head>
+<body style=background-color:#707070>
+  <h2>Combined Gears Calculator (for BABFT)</h2>
+
+  <label>Mode:</label>
+    <button id="basic">Basic</button>
+    <button id="worm">Worm</button>
+    <button id="rack">Rack</button>
+    <button id="planetary">Planetary</button>
+  <br><br>
+
+  <label id="basic1" style="display:none;">Gear type:
+    <select id="type">
+      <option value="external">external</option>
+      <option value="internal">internal</option>
+    </select>
+  </label>
+  <br id="basic2" style="display:none;">
+  <label id="basic3" style="display:none;">Gear diameter (studs): <input id="d_basic" type="number" step="any" value="20"></label>
+  <br id="basic4" style="display:none;">
+  <label id="basic5" style="display:none;">Teeth size (module): <input id="m_basic" type="number" step="any" value="1"></label>
+  <br id="basic6" style="display:none;">
+  <label id="thickness-label" style="display:none;">Outside thickness (studs): <input id="thickness" type="number" step="any" value="1"></label>
+  <br id="basic7" style="display:none;">
+
+  <label id="planet1" style="display:none;">Sun gear teeth: <input id="s" type="number" step="any" value="20"></label>
+  <br id="planet2" style="display:none;">
+  <label id="planet3" style="display:none;">Ring gear teeth: <input id="r" type="number" step="any" value="40"></label>
+  <br id="planet4" style="display:none;">
+  <label id="planet5" style="display:none;">Number of planet gears: <input id="n_p" type="number" step="any" value="4"></label>
+  <br id="planet6" style="display:none;">
+
+  <label id="rack1" style="display:none;">Teeth size (module): <input id="m_rack" type="number" step="any" value="1"></label>
+  <br id="rack2" style="display:none;">
+
+  <label id="worm1" style="display:none;">Worm gear diameter (in studs): <input id="d_worm" type="number" step="any" value="10"></label>
+  <br id="worm2" style="display:none;">
+  <label id="worm3" style="display:none;">Teeth size (module): <input id="m_worm" type="number" step="any" value="1"></label>
+  <br id="worm4" style="display:none;">
+  <label id="worm5" style="display:none;">Degrees for rotating:
+    <select id="q">
+      <option value="15">15</option>
+      <option value="5">5</option>
+    </select>
+  </label>
+  <br id="worm6" style="display:none;">
+
+  <button id="calc_basic" style="display:none;">Calculate</button>
+  <button id="calc_worm" style="display:none;">Calculate</button>
+  <button id="calc_rack" style="display:none;">Calculate</button>
+  <button id="calc_planetary" style="display:none;">Calculate</button>
+
+  <pre style="font-size: 20px;font-weight: normal" id="output">(Choose a mode)</pre>
+
+  <script>
+    //combined gears calculator 2026 Jan 16 (by @dabl2928 on youtube)
+
+    function round(n,d=2){p=Math.pow(10,d);return Math.round(n*p)/p;}
+    function input(id){return document.getElementById(id);}
+    function isNearlyInteger(x,e=1e-9){return Math.abs(Math.round(x)-x)<e;}
+
+    function basic(){
+      t=input('type').value;
+      d=parseFloat(input('d_basic').value);
+      m=parseFloat(input('m_basic').value);
+      thickness=parseFloat(input('thickness').value);
+
+      valid = (m!=0 && m>0
+      &&
+      d!=0 && d>0
+      &&
+      thickness!=0 && thickness>0
+      &&
+      isNearlyInteger(d/m)
+      );
+
+      if (valid) {
+        n_teeth=d/m;
+        odd=(Math.round(n_teeth)%2)===1;
+        out='blabla VALID'
+        if(t==='external'){
+          inner_d=d-2.4*m;
+          outer_d=d+2*m;
+          circle_piece=round(inner_d*Math.tan(Math.PI/n_teeth));
+        } else {
+          inner_d=d+2.4*m;
+          outer_d=d+2.4*m+2*thickness;
+          circle_piece=round(outer_d*Math.tan(Math.PI/n_teeth))
+        }
+
+        if (t==='internal') {tooth_height=round(0.6*2.2*m);} // 0.6 is the correction (makes it run smooth)
+        else {tooth_height=round(2.2*m);}
+
+        nt=Math.round(n_teeth);
+
+        if(nt<=5){g=0.6;}
+        else if(nt<=7){g=0.7;}
+        else if(nt<=12){g=0.8;}
+        else if(nt<=22){g=0.9;}
+        else if(nt<=57){g=1;}
+        else {g=1.1;}
+
+        tooth_arc_length=round(m*g);
+        deg=round(360/n_teeth);
+
+        if(t==='internal') AIS0=round(inner_d/2+1);
+        else AIS0=round(inner_d/2-1);
+
+        AIS1=round((circle_piece-2)/2);
+        AIS2=round((tooth_arc_length-2)/2);
+        AIS3=round(tooth_height-2);
+        //#####################################################
+        out=`========GEAR-INFO========\n`;
+        out+=`Type: ${t}\n`;
+        out+=`Number of teeth: ${nt}\n`;
+        out+=`Module (teeth size): ${m}\n\n`;
+        
+        if(odd) //ODDS
+			    if (t==='internal') {out+=`Inner radius: ${round(inner_d/2)} studs  (move for: ${round(AIS0)})\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+		      else {out+=`Inner radius: ${round(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;}
+		    else //EVEN
+			    if (t==='internal') {out+=`Inner diameter: ${round(inner_d)} studs  (move for: ${AIS0} on both sides)\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+		      else {out+=`Inner diameter: ${round(inner_d)} studs  (amount in scale: ${AIS0} for both sides)\n`;}
+
+        out+=`Circle piece: ${circle_piece}  (amount in scale: ${AIS1})\n`;
+        out+=`Tooth length: ${tooth_arc_length}  (amount in scale: ${AIS2})\n`;
+        out+=`Tooth height: ${tooth_height}  (amount in scale: ${AIS3})\n`;
+
+        out+=`\nDegrees for rotating and cloning: ${deg}\n`;
+
+        out+='\n==========CHECK-DIMENSIONS==========';
+        out+=`\nTooth part dimensions: ${round(2+2*AIS2)} x ${tooth_height}\n`;
+
+        if(odd)
+	        if (t===`internal`)
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
+	        else
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d/2}\n`}
+        else
+	        if (t==='internal')
+            {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
+	        else
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d}\n`}
+
+        if(odd)out+='\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)';
+      } else {
+        if (m==0 || m<0){out=`ERROR: Invalid module (teeth size: ${m})`
+        } else if (thickness==0 || thickness<0){out="ERROR: Invalid thickness"
+        } else if (d==0 || d<0) {out="ERROR: Invalid diameter"
+        } else if (!isNearlyInteger(d/m)) {out=`ERROR: Number of teeth isn't a full number ${d/m}`}
+      }
+
+      input('output').textContent=out;
+      input('output').style.fontSize='20px';
+      input('output').style.fontWeight='normal';
+    }
+
+    function basicinputs(){
+      input('basic1').style.display='';
+      input('basic2').style.display='';
+      input('basic3').style.display='';
+      input('basic4').style.display='';
+      input('basic5').style.display='';
+      input('basic6').style.display='';
+      input('basic7').style.display='';
+      input('thickness-label').style.display='none';
+      input('type').value='external'
+
+      input('worm1').style.display='none';
+      input('worm2').style.display='none';
+      input('worm3').style.display='none';
+      input('worm4').style.display='none';
+      input('worm5').style.display='none';
+      input('worm6').style.display='none';
+
+      input('rack1').style.display='none';
+      input('rack2').style.display='none';
+
+      input('planet1').style.display='none';
+      input('planet2').style.display='none';
+      input('planet3').style.display='none';
+      input('planet4').style.display='none';
+      input('planet5').style.display='none';
+      input('planet6').style.display='none';
+
+      input('calc_basic').style.display='';
+      input('calc_worm').style.display='none';
+      input('calc_rack').style.display='none';
+      input('calc_planetary').style.display='none';
+
+      asciiexternal();
+    }
+    function asciiinternal(){
+      a='\n'
+      a+='                                           ..~~~~:~:::::::~:~~~...\n'
+      a+='                                   .~::++==oooooooooo==oooooooooo==++::~.\n'
+      a+='                             .~:+==oo==o=o=======================oooo=ooo=++:~.\n'
+      a+='                         .::=oo==oooo==oo=oo=oo=ooo=oooooooooooooo==o===ooooooo=:~~\n'
+      a+='                     .~:===ooo===o=oooo==++::~~~~..=oooo=...~~~::++==oooooo===ooooo=:~.\n'
+      a+='                   ~+=oooo===oooooooooo=.          =o====           =ooo==oooooo==oooo=+~.\n'
+      a+='                ~:==o===o=oooo+:~.~ooo=o+          =oooo=          +ooo=o:.~:+oooo=ooooooo:~\n'
+      a+='              ~+ooo=oooooo=:~.     :o=ooo=.        :+++++        .+ooo=o:     .~:===ooo==ooo=~\n'
+      a+='            :=oooooo=o===~          ~oo=++~                      ~++=o=:          ~+ooo=oooooo=:\n'
+      a+='          ~=oo=oooo==o===+~          ~.                              .~          ~+======ooooooo=:\n'
+      a+='        ~+oooooo=oo+:==oooo=:.                                                .:==oo=o=:+oooooo=oo+~\n'
+      a+='       :=oooooooo+~  .~+ooooo+.                                               +oo=o=+~.  ~+oo=ooo=oo:\n'
+      a+='     .+==oooooo=~       .:+:.                                                   :=:~       ~=oooooo=o+.\n'
+      a+='    .=o=oooooo+                                                                             .:oooooo=o=.\n'
+      a+='   .=ooooooo=o~..                                                                           .~=oooooo=oo.\n'
+      a+='   =o=oooooooooo==::~.                                                                .~::==oooooooooooo=.\n'
+      a+='  +oooooooo++=ooooooo~                                                                .==oooooo=+oooooo==+\n'
+      a+=' ~o=oooooo+   ~~:++=.                                                                  .==+:~..  +o=oooo=o~\n'
+      a+=' =oooooooo.                                                                                      .=ooooooo=\n'
+      a+='~oooooooo+                                                                                        :oooooooo~\n'
+      a+=':o=oooo=o.                                                                                        ~o=oooooo:\n'
+      a+='+oooooooo::~::~::~                                                                        ~~:::~:::=ooooooo=\n'
+      a+='=ooooooooooo=====o                                                                        =oo====oo==oooooo=\n'
+      a+='=oooooooo========+                                                                        +=+===+==oooooo=o=\n'
+      a+='+oooooooo.                                                                                        .ooooooo=+\n'
+      a+=':==oooo=o:                                                                                        :==oooo=o:\n'
+      a+='.==oooooo=                                                                                        ===oooooo.\n'
+      a+=' :oooooooo:     .~::                                                                    ::~.     :=ooooo=o:\n'
+      a+=' .==ooooooo~::+=oo==+                                                                  :o====+::~ooooooooo.\n'
+      a+='  ~o=oooooooooo==o==+~                                                                ~+===oooooooooooo==~\n'
+      a+='   :==ooooo===+::~.                                                                      .~::+===ooooo=o:\n'
+      a+='    :oooooooo=~                                                                              ~==ooooooo:\n'
+      a+='     ~ooooooo=o:.        ~~.                                                    .~~        .:=oooooooo~\n'
+      a+='      ~=o=oooooo=~     ~+oo=+~                                                ~+=oo+~     ~=oooooooo=~\n'
+      a+='        :ooooooooo+~.:=o=oo==:                                                :==o=oo=:.~+oo=oooooo:\n'
+      a+='         ~+oo=ooooooo=o==o+~                                                    ~+=o=ooooo=ooo=oo+~\n'
+      a+='           ~=oooooooo==o=~          .++:~~.                      .~~:++.          ~+oo=oooooooo=~\n'
+      a+='             ~+ooooooooo=+:.       .=ooooo~        ~~~~~~        ~ooooo=.       ~:+=ooooo=ooo+~\n'
+      a+='               ~+oooo=ooo==o=+~.  .=oo=oo~         ==oooo         ~ooo=o=.  .~:=o==ooo=oooo:~\n'
+      a+='                 .~+oooo===ooooo=+=oooo=~          ====o=          ~==ooo=+=ooooo==ooo==+:.\n'
+      a+='                    .~+=oooo====oo=oooo=~~~..      =oooo=      ..~~~=ooo===oooo=oooo=+:.\n'
+      a+='                       .~:+=ooooo===ooooooooo===+++=oooo=++++==ooooooooo====oo=oo=:~.\n'
+      a+='                           .~:+=oooooooo=====ooo=oo==oooo=oooo======ooooo==o=+:~.\n'
+      a+='                                .~~:+==o=o==ooooo=oooo==ooooo==o=oooo==+::~.\n'
+      a+='                                       .~~:::++++==========++++::~~~.\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='4px';
+      input('output').style.fontWeight='bold';
+    }
+    function asciiexternal(){
+      a='\n'
+      a+='                                                     ... ...\n'
+      a+='                                                    ~=ooo===\n'
+      a+='                                  .~~:+             ~o=oooo=             .+:~.\n'
+      a+='                                :=oooo=+            ~o=ooo==            .==ooo==~\n'
+      a+='                                ~=oo===o:           ~==oooo=           .=o=o===+\n'
+      a+='                                 ~ooooo=o:          :==oo===.         .=oooo===\n'
+      a+='                                  ~ooooo=o:.~::++======oo=o====++:::~~+==oooo=.\n'
+      a+='                 .~+:~             ~======oooo==ooooooooooooooooo==ooo=======.             ~++~\n'
+      a+='               .:=oooo+~         ~:+=oooooo======ooooooooooooooooo===ooooooo=::.        .:+ooo=+~\n'
+      a+='              .:o=o======~   .~+=o==oooooooooooooooooooooooooooooooooo=ooooo=====:~   .:=oo=====o~\n'
+      a+='                .:=ooo=ooo=:+=ooo==oooooooooooooooooooooooooooooooooooooooooo==oooo=::ooo==oo=+~\n'
+      a+='                   :=oo====o=o=oooooooooooooooooooooooooooooooooooooooooooooooooo==ooo===oo=+~\n'
+      a+='                     ~===oo===oooooooooooooooooooooooooooooooooooooooooooooooooooooo=ooo==:.\n'
+      a+='                     :==oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo+~\n'
+      a+='      ..           ~==oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo:.           .\n'
+      a+='     ~oo=+:~.     :oo=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o=~    .~~:+=o+\n'
+      a+='    .oo=ooooo==:~+o=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=oo:::=o==ooo==:\n'
+      a+='    +=oooooo=ooooo=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo==oo==ooooo=~\n'
+      a+='      .~:+=======ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo==ooo==::~.\n'
+      a+='           .~:=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=+~..\n'
+      a+='             ~o=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o+\n'
+      a+='             =ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo==:\n'
+      a+='            ~o=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o=\n'
+      a+='            +==ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo~\n'
+      a+='.==========+=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo+==========:\n'
+      a+=' =oooooooooo=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo==:\n'
+      a+='.o=oo==o=oo==ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o=oo==o==o:\n'
+      a+=' ~~~~~~~~~~~+o=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo:~~~~~~~~~~.\n'
+      a+='            :o=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=\n'
+      a+='            .oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o+\n'
+      a+='             :o=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o.\n'
+      a+='             ~=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=o:\n'
+      a+='        .~:+===oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo===+:~~.\n'
+      a+='    ::+=ooooo===oo=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=oooooo==::~\n'
+      a+='    :=oo====ooo=+===oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo==+o==oo==ooo=.\n'
+      a+='     :oooo=+:~.  ~===ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo:  .~::===oo=.\n'
+      a+='      :~~.        .+oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=~         ~~:.\n'
+      a+='                    ~=oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=:.\n'
+      a+='                     .+=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=:\n'
+      a+='                   .:=o====oo==ooooooooooooooooooooooooooooooooooooooooooooooooooooooo=====+~\n'
+      a+='                 .:=oooo=oo=oooo=oooooooooooooooooooooooooooooooooooooooooooooo==ooo==oooooo==:\n'
+      a+='               ~+ooo==ooo+~  :+oooooooooooooooooooooooooooooooooooooooooooooooooo=:~ .:=oo===oo=:.\n'
+      a+='               :=oooooo+.      .~+==oooooooooooooooooooooooooooooo=o==ooooooo=+:~       ~=oo=ooo+~\n'
+      a+='                 ~+o=:.            ~====o=oooooooo==oooooooooo=oooo=oooooo==+.            ~+o=:.\n'
+      a+='                   ~.             .=o=o==o+:+==oooooooooooooooo=oo==+:=======:              ~.\n'
+      a+='                                 .=oooooo+     ..~~~:==o====~~~~..    ~o=ooo==:\n'
+      a+='                                 ===oo=o=           ~o=oooo=           :==oo==o~\n'
+      a+='                                +oooooo=.           ~o=oooo=            :ooooooo~\n'
+      a+='                                .~::+o=.            ~o======             :o=+:~~.\n'
+      a+='                                     ..             ~oooooo=              .\n'
+      a+='                                                    .::~::~:\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='4px';
+      input('output').style.fontWeight='bold';
+    }
+
+    function worm(){
+      d=parseFloat(input("d_worm").value);
+      m=parseFloat(input("m_worm").value);
+      q=parseFloat(input("q").value);
+
+      valid = (m!=0 && m>0
+      &&
+      d!=0 && d>0
+      );
+
+      if (valid) {
+        n=360/q; //number of circle sides
+
+        inner_d = round(d-2.4*m);
+        AIS_1 = round(inner_d/2-1); //inner diameter
+        outer_d = round(d+2*m);
+
+        circle_piece = round(inner_d*Math.tan(Math.PI/n));
+        AIS_0 = round(circle_piece/2-1); //circle piece
+        
+        pitch = round(m*Math.PI);
+        gamma = round(180/Math.PI*Math.atan(m/inner_d));
+        middle_part = round(0.5*m*Math.PI);
+
+        tooth_height = round(2.2*m,2);
+        AIS_2 = round(tooth_height-2,2); //tooth height
+
+        tooth_top = round(outer_d*Math.tan(Math.PI/n));
+        AIS_3 = round(tooth_top/2-1); //circle piece but for tooth
+
+        tooth_width = round(1.1*m);
+        AIS_4 = round(tooth_width/2-1); //1.1m tooth width thing
+
+        s_x=2+AIS_2;
+        s_y=2+2*AIS_4;
+        s_z=2+2*AIS_3;
+
+        t_x=2+2*AIS_0;
+        t_y=2+2*AIS_1;
+        t_z=pitch;
+
+        spiral_block = s_x*s_y*s_z/8;
+        stem_block = t_x*t_y*t_z/8;
+
+        spiral = n*spiral_block;
+        if (spiral_block<1){spiral = n;}
+
+        stem = n/2*stem_block;
+        if (stem_block<1){stem = n/2;}
+
+        blocks = Math.ceil(spiral+stem);
+
+        out="========WORM GEAR INFO:========\n"
+        out+=`Module: ${m}\n\n`
+        out+=`Circle piece: ${circle_piece}  (amount in scale: ${AIS_0} for both sides)\n`
+        out+=`Inner diameter: ${inner_d}  (amount in scale: ${AIS_1} for both sides)\n\n`
+        out+=`Helical angle: ${gamma}\n`
+        out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS_2})\n`
+        out+=`Tooth top length: ${tooth_top} (amount in scale: ${AIS_3} for both sides)\n`
+        out+=`Tooth width: ${tooth_width} (amount in scale: ${AIS_4} for both sides)\n`
+        out+=`\nCloning table:\n`
+        out+=`-180 degrees: ${round(pitch/2)} once\n`
+        out+=`-90 degree: ${round(pitch/4)} once\n`
+        out+=`-45 degree: ${round(pitch/8)} once\n`
+        out+=`-15 degree: ${round(pitch/24)} three times\n`
+        if (q==5) {out+=`-5 degree: ${round(pitch/72)} three times\n`}
+        out+=`\nFull pitch: ${pitch}  (${blocks} blocks per pitch/loop)\n`
+        out+=`\n==========CHECK-DIMENSIONS==========\n`
+        out+=`Center part: ${t_x} x ${t_y}\n`
+        out+=`Spiral part: ${s_x} x ${s_y} x ${s_z}\n`
+      }
+
+      input('output').textContent=out;
+      input('output').style.fontSize='20px';
+      input('output').style.fontWeight='normal';
+    }
+    function worminputs(){
+      input('basic1').style.display='none';
+      input('basic2').style.display='none';
+      input('basic3').style.display='none';
+      input('basic4').style.display='none';
+      input('basic5').style.display='none';
+      input('basic6').style.display='none';
+      input('basic7').style.display='none';
+      input('thickness-label').style.display='none';
+
+      input('worm1').style.display='';
+      input('worm2').style.display='';
+      input('worm3').style.display='';
+      input('worm4').style.display='';
+      input('worm5').style.display='';
+      input('worm6').style.display='';
+
+      input('rack1').style.display='none';
+      input('rack2').style.display='none';
+
+      input('planet1').style.display='none';
+      input('planet2').style.display='none';
+      input('planet3').style.display='none';
+      input('planet4').style.display='none';
+      input('planet5').style.display='none';
+      input('planet6').style.display='none';
+
+      input('calc_basic').style.display='none';
+      input('calc_worm').style.display='';
+      input('calc_rack').style.display='none';
+      input('calc_planetary').style.display='none';
+
+      a='\n'
+      a+='  .........               .........               .........               .........               ........\n'
+      a+='  :=+++++++.              :++++++++               :+++++++:               ++++++++:               ++++++++.\n'
+      a+='  :+:++++++.              :+:++++++.              +++++++++.              +++++++++              .=:++++++.\n'
+      a+='  :+:++++++:              :+:++++++:              ++++++++=.              +++++++++.             .=+++++++.\n'
+      a+='  :=++++++++.             +=++++++++              +=:++++++:              =++++++++:             .o+++++++.\n'
+      a+='  :=++++++++.             :o++++++++.             +o++++++++.             ==++++++++             .o=++++++.\n'
+      a+='  :o++++++++:             :o++++++++:             +o++++++++:             =o++++++++.            .o=++++++.\n'
+      a+='  :==++++++++.            :o=++++++++.            +o++++++++:             =o++++++++:             oo++++++.\n'
+      a+='  :o=++++++++:            :o=++++++++.            +o=++++++++.            =o=++++++++.           .oo++++++.\n'
+      a+='.==oo=++++++++=============oo+++++++++=============oo+++++++++============ooo+++++++++============oo=+++++.\n'
+      a+='.oooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo=++++++++ooooooooooooooo+++++++++ooooooooooooooo+++++.\n'
+      a+='.o=ooo+++++++++ooooooooooooooo++++++++==ooooooooooooo=++++++++=o=oooooooooooo=++++++++=oooooooooooooo=++++.\n'
+      a+='.ooooo=:+++++++=oooooooooooooo+++++++++ooooooooooooooo+++++++++ooooooooooooooo+++++++++oooooooooooooo=++++.\n'
+      a+='.ooooo=++++++++==ooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo+++++++++=oooooooooooooo++++.\n'
+      a+='.oooooo+++++++++ooooooooooooooo+++++++++oooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo=:++.\n'
+      a+='.o=oooo=++++++++=ooooooooooooo==++++++++ooooooooooooooo+++++++++ooooooooooooooo+++++++++ooooooooooooooo+++.\n'
+      a+='.oooooo=++++++++=oooooooooooooo=++++++++=ooooooooooooo==++++++++=oooooooooooooo+++++++++=oooooooooooooo+++.\n'
+      a+='.ooooooo+++++++++ooooooooooooooo+++++++++oooooooooooooo=+++++++++oooooooooooooo=++++++++=oooooooooooooo=:+.\n'
+      a+='.o=ooooo=++++++++=oooooooooooooo+++++++++=oooooooooooooo+++++++++ooooooooooooooo+++++++++ooooooooooooooo++.\n'
+      a+='.oooooooo+++++++++oooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo++.\n'
+      a+='.oooooooo+++++++++ooooooooooooooo+++++++++oooooooooooooo=+++++++++oooooooooooooo=++++++++=oooooooooooooo=+.\n'
+      a+='.o=oooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo+++++++++=oooooooooooooo+++++++++ooooooooooooooo+.\n'
+      a+='.ooooooooo++++++++=oooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo=++++++++=oooooooooooooo=.\n'
+      a+='.o=ooooooo+++++++++=oooooooo=ooooo+++++++++ooooooooooooooo+++++++++oooooooooooooo=++++++++==ooooooooooooo=.\n'
+      a+='.oooooooooo++++++++=oooooooooooooo=++++++++=oooooooooooooo=:+++++++ooooooooooooooo+++++++++ooooooooooooooo.\n'
+      a+='.=+===+====+++++++++oo====+=====+=++++++++++oo====+===+===+++++++++=oo====+====+==+++++++++=oo======+==+==.\n'
+      a+='           .++++++++=o+            :++++++++oo:            :++++++++oo:            :++++++++oo.\n'
+      a+='            ++++++++=o+            .++++++++=o+            .++++++++==:            .++++++++=o.\n'
+      a+='            :++++++++o=             :++++++++o:             ++++++++=o:            .++++++++=o:\n'
+      a+='            .++++++++o+             :++++++++=+             :++++++++o:             :++++++++o.\n'
+      a+='             ++++++++==              ++++++++o+             .++++++++=:             .++++++++o.\n'
+      a+='             :+++++++++              :+++++++=+              ++++++++=:             .++++++++=:\n'
+      a+='             .+++++++++              .++++++:+:              :++++++:=:              :+:++++++.\n'
+      a+='              +++++++++              .++++++++:              .++++++++:              .=++++++=.\n'
+      a+='              .........               .........               .........               .........\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='5px';
+      input('output').style.fontWeight='bold';
+    }
+
+    function rack(){
+      pi = Math.PI;
+      m = parseFloat(input("m_rack").value);
+
+      valid = (m != 0 && m>0);
+
+      clone_distance=round(m*pi);
+	    tooth_height = round(2.2*m);
+	    tooth_arc_length = round(1.1*m);
+	    slope_length = round(tooth_height/Math.cos(12*pi/180));
+
+      AIS0 = round(tooth_height-2);
+	    AIS1 = round(tooth_arc_length/2-1);
+	    AIS2 = round(slope_length-tooth_height);
+
+      p_x = round(2+2*AIS1);
+	    p_y = round(2+AIS0);
+	    a_x = round(p_x);
+	    a_y = round(p_y+AIS2);
+
+      out=''
+      if (valid){
+		    out+='========RACK-INFO========\n';
+		    out+=`Module (teeth size): ${m}\n\n`;
+		    out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
+		    out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
+		    out+=`Angle: 12 (use mirror)\n`;
+		    out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
+		    out+=`Clone distance: ${clone_distance}\n`;
+		    out+=`\n==========CHECK-DIMENSIONS==========\n`;
+		    out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
+		    out+=`Angled pieces: ${a_x} x ${a_y}`;
+	    } else{
+		    out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
+	    }
+
+      input('output').textContent=out;
+      input('output').style.fontSize='16px';
+      input('output').style.fontWeight='normal';
+    }
+    function rackinputs(){
+      input('basic1').style.display='none';
+      input('basic2').style.display='none';
+      input('basic3').style.display='none';
+      input('basic4').style.display='none';
+      input('basic5').style.display='none';
+      input('basic6').style.display='none';
+      input('basic7').style.display='none';
+      input('thickness-label').style.display='none';
+
+      input('worm1').style.display='none';
+      input('worm2').style.display='none';
+      input('worm3').style.display='none';
+      input('worm4').style.display='none';
+      input('worm5').style.display='none';
+      input('worm6').style.display='none';
+
+      input('rack1').style.display='';
+      input('rack2').style.display='';
+
+      input('planet1').style.display='none';
+      input('planet2').style.display='none';
+      input('planet3').style.display='none';
+      input('planet4').style.display='none';
+      input('planet5').style.display='none';
+      input('planet6').style.display='none';
+
+      input('calc_basic').style.display='none';
+      input('calc_worm').style.display='none';
+      input('calc_rack').style.display='';
+      input('calc_planetary').style.display='none';
+
+
+      a='\n'
+      a+='       .++:+:+::+:                  .+::+:::++:                  ~+:++:+::+:                  ~+::+:+::+:                  ~+::+:+:+::\n'
+      a+='       +oooooooooo:                 +oooooooooo~                 +oooooooooo~                 =oooooooo=o~                 =oooooooooo.\n'
+      a+='      .oo=o====o===                .o===o===o==+                .o======o===+                ~o===o=o====+                ~o=========o+\n'
+      a+='      :o=oooooooo=o~               :o=oooooooooo.               +o=oooooooooo.               +oooooooooo==.               +==ooooooooo=\n'
+      a+='      =oooooooooo=o+               =oooooooooo=o+               =oooooooooo=o:               ooooooooooo==:              .ooooooooooo=o:\n'
+      a+='     ~o=oooooooooooo              ~o=ooooooooooo=              ~o=ooooooooooo=              :o=ooooooooooo=              :o=ooooooooooo+\n'
+      a+='     +o=oooooooooo=o:             +oooooooooooooo~             =oooooooooooo=o~             =oooooooooooo==~             =o=oooooooooooo~\n'
+      a+='    .ooooooooooooooo=            .ooooooooooooooo=            .ooooooooooooo=o+            ~==ooooooooooo=o+            ~o=ooooooooooo=o+\n'
+      a+='    :o=oooooooooooooo~           :o=oooooooooooo=o.           +o=oooooooooooooo.           +==oooooooooooooo.           +o=ooooooooooooo=.\n'
+      a+='    =oooooooooooooo==+           =oooooooooooooo=o+           =oooooooooooooo=o:          .ooooooooooooooo=o:          .ooooooooooooooo=o~\n'
+      a+='.~~:oooooooooooooooo==::~~~~~~~~+ooooooooooooooooo=~~~~~~~~~~+o=ooooooooooooooo=:~~~~~~~~~+ooooooooooooooo=o=~~~~:~~~~~+o=ooooooooooooooo=~~~\n'
+      a+=':oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n'
+      a+=':===oooooooooooooooooo==========ooooooooooooooooooo=====o====ooooooooooooooooooo==========ooooooooooooooooooo==========ooooooooooooooooooo===\n'
+      a+=':o=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=\n'
+      a+=':o=ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=\n'
+      a+=':==ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo=\n'
+      a+=':==oo===oooo=oo==ooo===oo===o=o==ooo=ooo===oo==o===oo====oo==o=oo===o=o==ooo===oo===o=o===ooo==o===oo==o=ooo=oo==ooo===oo====ooo=ooo=ooo===o=\n'
+      a+=':oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\n'
+      a+='~++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='4px';
+      input('output').style.fontWeight='bold';
+    }
+
+    function planetary(){
+      s = parseFloat(input("s").value);
+	    r = parseFloat(input("r").value);
+	    n_p = parseFloat(input("n_p").value);
+
+      valid = (s < r && Math.round(s / n_p) - s / n_p === 0 && Math.round(r / n_p) - r / n_p === 0);
+
+      out=''
+      if(valid) {out="INFO: valid planetary gear set\n\n"} else {out="WARNING: planetary gear set cannot mesh (calculating ratios anyway)\n\n"}
+
+      R = (-r)/s
+
+	    f_c=(1/R) //carrier fixed
+	    out+="Carrier fixed:\n"
+	    out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
+	    out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
+
+	    f_s=(R-1)/R //sun fixed
+	    out+="Sun fixed:\n"
+      out+=` -Carrier as input (outputs with ring): ${1/f_s} torque multiplication\n`                  
+      out+=` -Ring as input (outputs with carrier): ${f_s} torque multiplication\n`
+
+	    f_r=(-1)*(R-1) //ring gear fixed
+	    out+="Ring fixed:\n"
+      out+=` -Sun as input (outputs with carrier): ${f_r} torque multiplication\n`                  
+    	out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
+
+      input('output').textContent=out;
+      input('output').style.fontSize='16px';
+      input('output').style.fontWeight='normal';
+    }
+    function planetaryinputs(){
+      input('basic1').style.display='none';
+      input('basic2').style.display='none';
+      input('basic3').style.display='none';
+      input('basic4').style.display='none';
+      input('basic5').style.display='none';
+      input('basic6').style.display='none';
+      input('basic7').style.display='none';
+      input('thickness-label').style.display='none';
+
+      input('worm1').style.display='none';
+      input('worm2').style.display='none';
+      input('worm3').style.display='none';
+      input('worm4').style.display='none';
+      input('worm5').style.display='none';
+      input('worm6').style.display='none';
+
+      input('rack1').style.display='none';
+      input('rack2').style.display='none';
+
+      input('planet1').style.display='';
+      input('planet2').style.display='';
+      input('planet3').style.display='';
+      input('planet4').style.display='';
+      input('planet5').style.display='';
+      input('planet6').style.display='';
+
+      input('calc_basic').style.display='none';
+      input('calc_worm').style.display='none';
+      input('calc_rack').style.display='none';
+      input('calc_planetary').style.display='';
+
+      a='\n'
+      a+='                                                       ......~.....\n'
+      a+='                                           ..~~::++====oooooooooooo===+++::~~..\n'
+      a+='                                     .~::+=oooooooooooooooo=ooooooooooo==ooooo==+::~.\n'
+      a+='                                .~:+=oooooooo=oo===oo=ooooooooooooooooooo=o===oooo==o=::~.\n'
+      a+='                            .~:=oo==oo==ooooooo======ooooooooooooooo=o===oooooooo===ooooo=+:~.\n'
+      a+='                         .:+ooooo===oooooo==oo=oo===ooo===========ooooooooooo====oooooo==oooo=+:.\n'
+      a+='                      .:=o=oo=oooooo===oooooo==+::~~~...          ...~~~::+===ooo=o===ooooo==ooo=+:.\n'
+      a+='                   .:+oooo=ooooooo=ooo=o++:~..                               ~~:+=ooooo===oooo==oo=o+~\n'
+      a+='                 .:==ooooooooo==ooo=+:~.                                          .~:+ooo=o=oooooo=ooo=:.\n'
+      a+='               ~+=oo=oooooo==o=o=:~.                                                  .~+=oooooooooo==ooo:.\n'
+      a+='             ~+===ooooooooooo=:~                                                          ~:oooo=oooooooooo:.\n'
+      a+='           .:oo==ooooooooo=+~                                                               .~+===oooooooooo=:\n'
+      a+='          ~=ooooooooooooo:.                                                                    ~+=oooooooooooo=~\n'
+      a+='         +==ooooooooo==:.  .....                                                          .....  .:==ooooooooooo:\n'
+      a+='       .=o=ooooooooo=+~~:+=ooooo==+:.                                                ~:+==oooo==+:~:+=ooooooooo=o+.\n'
+      a+='      ~oooooooooooo=++oooooooooooo==o=:                                            :=o==oooooooooo==+=oooooooooooo=.\n'
+      a+='     ~oooooooooooo==oooooooooooooo==ooo+.             .~~~~:::::~~~.             ~=ooo==oooooooooo=oo===ooooooooo===~\n'
+      a+='    ~oooooooooo=o+=ooooooooooooooooooo=o=.       ~:+==oooooooooooooo==+:.       ~oo=ooooooooooooooooooo++o=ooooooooo=.\n'
+      a+='   .o=oooooooooo:~ooooooooooooooooooooo=o:   .:+oo=o=oooo====o===o===o==o=+~.   +o=oooooooooooooooooooo=.+ooooooooooo=\n'
+      a+='   +ooooooooo==+ ~==ooooooooooooooooooo=o~ ~+ooooo==ooooooooooooooooooo=ooooo:~ :o=ooooooooooooooooooo==. ==oooooooo=o+\n'
+      a+='  :=oooooooo===   =o=ooooooooooooooooooo=:+ooo=oooo=ooooooooooooooooooooooooo==+:=o=ooooooooooooooooo=o+  .=ooooooooo=o~\n'
+      a+='  =ooooooooooo~   .+=ooo=ooooooooo==ooo==oo=oooooooooooooooooooooooooooooooooooo===oo==ooooooooooo=ooo+    ~o=ooooooooo=\n'
+      a+=' :o=ooooooooo:      ~+ooo=ooooooooooo+:=o=oooooooooooooooooooooooooooooooooooooooo=:=oooooooooooooo=+~      =ooooooooo==~\n'
+      a+=' +ooooooooo=o~        .::==ooooo==+:. +o=ooooooooooooooooooooooooooooooooooooooooo=: ~:+==ooooo=+:~.        ~o=ooooooo=o:\n'
+      a+='.=oooooooooo=              .....     :==oooooooooooooooooooooooooooooooooooooooooo=o~     .....             .ooooooooooo=\n'
+      a+='~ooooooooooo+                        =oooooooooooooooooooooooooooooooooooooooooooo==+                        =oooooooooo=.\n'
+      a+='~o=ooooooooo:                       .ooooooooooooooooooooooooooooooooooooooooooooooo=                        +oooooooooo=.\n'
+      a+='~ooooooooo=o+                       .=oooooooooooooooooooooooooooooooooooooooooooooo=                        =ooooooooooo.\n'
+      a+='.ooooooooooo+                        ==ooooooooooooooooooooooooooooooooooooooooooo=o:                        =ooooooooooo\n'
+      a+=' =oooooooooo=                        ~o=oooooooooooooooooooooooooooooooooooooooooo=o.                       .ooooooooooo+\n'
+      a+=' +o=ooooooooo~                        :o==oooooooooooooooooooooooooooooooooooooo==o~                        :ooooooooo=o:\n'
+      a+=' ~==ooooooooo=                         :oo=oooooooooooooooooooooooooooooooooooo===~                        .=oooooooooo=.\n'
+      a+='  =ooooooooooo:                         ~=oo=ooooooooooooooooooooooooooooooo=ooo+~                         :ooooooooo=o+\n'
+      a+='  ~ooooooooooo=.                          :=oooo=oooooooooooooooooooooooo=oooo=~                          ~oooooooooo=o.\n'
+      a+='   :o=ooooooooo=.                           ~+ooooo==oooooooooooooooo=ooooo=+~                           ~o=oooooooo=o:\n'
+      a+='    +ooooooooooo=.                            .::=oooooooooooooooooooooo=+~.                            ~=ooooooooo==+\n'
+      a+='    .=o=ooooooooo=~                               .~:++====ooo=====+::~.                               ~==oooooooo==+\n'
+      a+='     .=oooooooooooo~                                   .::+=oo=+:~.                                   :oooooooooo==+\n'
+      a+='       +ooooooooooo=+.                              ~:==ooooooooooo+:.                              ~+==oooooooooo+\n'
+      a+='        :oooooooooooo=:                           .+=ooooooooooo=ooooo:                           .:oo=ooooooo==o:\n'
+      a+='         ~=o=oooooooooo=:                        .=o==ooooooooooooooooo=.                       .:=oooooooooooo=~\n'
+      a+='          .+==ooooooooooo=:.                     =o=oooooooooooooooooo=o+                     .:=ooooooooo====:\n'
+      a+='            ~+oo=ooooooo=o=o:~                  .oooooooooooooooooooooo==                   ~+ooo=ooooooo=o=+~\n'
+      a+='              ~=o=o=oooooo=ooo=:~                =o=oooooooooooooooooo=o:                ~:=oooooooooo=ooo+~\n'
+      a+='                ~=oooooooooo=oooo=+~.            .=oo=oooooooooooooo=oo+.            .::=ooooooooooo=ooo+~\n'
+      a+='                  ~+=oo===ooooo==oooo=:~~.        .:oo=ooooooooooooooo:         .~~+=oooo=ooooooo=ooo=:~\n'
+      a+='                    .:==ooo==oooooo=ooooo==::~..     :++=oooooooo==+~.    .~~:+==oooo==ooooooo=oo=o+~.\n'
+      a+='                       ~:+==ooo=oooooo==oooooooo==++:~::++======+::~~:++==ooooooooooooooo===oooo+:.\n'
+      a+='                          .:+oooooo===ooooo===oooo=ooooo=ooooooooooooo====oo===oooooo==oo=oo=+~.\n'
+      a+='                              ~:+=oooooo====oooooo====o=oooooooooo=====oooooooo===oooooo=+:~\n'
+      a+='                                  ~~:+=ooooooooo=o==oo=o===oo=oo=o==o=====ooooooooo=+:~.\n'
+      a+='                                       .~::+==ooooo==oo==ooo==oooo==oooooooo=++:~~.\n'
+      a+='                                              ..~~::::++++=+=+=+++++:::~~~..\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='4px';
+      input('output').style.fontWeight='bold';
+    }
+
+    input("basic").onclick=basicinputs;
+    input("worm").onclick=worminputs;
+    input("rack").onclick=rackinputs;
+    input("planetary").onclick=planetaryinputs;
+
+    input("calc_basic").onclick=basic;
+    input("calc_worm").onclick=worm;
+    input("calc_rack").onclick=rack;
+    input("calc_planetary").onclick=planetary;
+
+    input('type').onchange=e=>{
+      input('thickness-label').style.display=e.target.value==='internal'?'block':'none';
+      if (e.target.value === 'internal') {
+        asciiinternal();
+      } else {
+        asciiexternal();
+      }
+    };
+  </script>
+</body>
