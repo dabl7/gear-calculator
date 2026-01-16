@@ -83,7 +83,6 @@
       if (valid) {
         n_teeth=d/m;
         odd=(Math.round(n_teeth)%2)===1;
-        out='blabla VALID'
         if(t==='external'){
           inner_d=d-2.4*m;
           outer_d=d+2*m;
@@ -122,11 +121,11 @@
         out+=`Module (teeth size): ${m}\n\n`;
         
         if(odd) //ODDS
-			    if (t==='internal') {out+=`Inner radius: ${round(inner_d/2)} studs  (move for: ${round(AIS0)})\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
-		      else {out+=`Inner radius: ${round(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;}
-		    else //EVEN
-			    if (t==='internal') {out+=`Inner diameter: ${round(inner_d)} studs  (move for: ${AIS0} on both sides)\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
-		      else {out+=`Inner diameter: ${round(inner_d)} studs  (amount in scale: ${AIS0} for both sides)\n`;}
+                            if (t==='internal') {out+=`Inner radius: ${round(inner_d/2)} studs  (move for: ${round(AIS0)})\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+                      else {out+=`Inner radius: ${round(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;}
+                    else //EVEN
+                            if (t==='internal') {out+=`Inner diameter: ${round(inner_d)} studs  (move for: ${AIS0} on both sides)\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+                      else {out+=`Inner diameter: ${round(inner_d)} studs  (amount in scale: ${AIS0} for both sides)\n`;}
 
         out+=`Circle piece: ${circle_piece}  (amount in scale: ${AIS1})\n`;
         out+=`Tooth length: ${tooth_arc_length}  (amount in scale: ${AIS2})\n`;
@@ -138,15 +137,15 @@
         out+=`\nTooth part dimensions: ${round(2+2*AIS2)} x ${tooth_height}\n`;
 
         if(odd)
-	        if (t===`internal`)
-		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
-	        else
-		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d/2}\n`}
+                if (t===`internal`)
+                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
+                else
+                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d/2}\n`}
         else
-	        if (t==='internal')
+                if (t==='internal')
             {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
-	        else
-		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d}\n`}
+                else
+                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d}\n`}
 
         if(odd)out+='\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)';
       } else {
@@ -317,6 +316,8 @@
       d-2.4*m>=0.05
       &&
       ((d-2.4*m)*Math.tan(Math.PI/(360/q)))>=0.05
+      &&
+      180/Math.PI*Math.atan(m/(d-2.4*m))<=30
       );
 
       if (valid) {
@@ -383,7 +384,9 @@
         if (m==0 || m<0) {out=`ERROR: Invalid module (teeth size: ${m})`
         } else if (d==0 || d<0) {out="ERROR: Invalid diameter"
         } else if (d-2.4*m<0.05) {out=`ERROR: Bigger diameter or smaller module (inner diameter becomes ${round(d-2.4*m)})`
-        } else if (((d-2.4*m)*Math.tan(Math.PI/(360/q)))<0.05) {out=`ERROR: Bigger diameter, smaller module or more degree for rotating (circle piece dimension becomes ${round((d-2.4*m)*Math.tan(Math.PI/(360/q)))})`}
+        } else if (((d-2.4*m)*Math.tan(Math.PI/(360/q)))<0.05) {out=`ERROR: Bigger diameter, smaller module or more degree for rotating (circle piece dimension becomes ${round((d-2.4*m)*Math.tan(Math.PI/(360/q)))})`
+        } else if (180/Math.PI*Math.atan(m/(d-2.4*m))>30) {out=`ERROR: Helix angle is too steep: ${round(180/Math.PI*Math.atan(m/(d-2.4*m)))} (increase diameter/decrease module)`
+        } else {out=`ERROR: Unknown (comment which values you used and I will fix it)`}
       }
 
       input('output').textContent=out;
@@ -470,34 +473,34 @@
       valid = (m != 0 && m>0);
 
       clone_distance=round(m*pi);
-	    tooth_height = round(2.2*m);
-	    tooth_arc_length = round(1.1*m);
-	    slope_length = round(tooth_height/Math.cos(12*pi/180));
+            tooth_height = round(2.2*m);
+            tooth_arc_length = round(1.1*m);
+            slope_length = round(tooth_height/Math.cos(12*pi/180));
 
       AIS0 = round(tooth_height-2);
-	    AIS1 = round(tooth_arc_length/2-1);
-	    AIS2 = round(slope_length-tooth_height);
+            AIS1 = round(tooth_arc_length/2-1);
+            AIS2 = round(slope_length-tooth_height);
 
       p_x = round(2+2*AIS1);
-	    p_y = round(2+AIS0);
-	    a_x = round(p_x);
-	    a_y = round(p_y+AIS2);
+            p_y = round(2+AIS0);
+            a_x = round(p_x);
+            a_y = round(p_y+AIS2);
 
       out=''
       if (valid){
-		    out+='========RACK-INFO========\n';
-		    out+=`Module (teeth size): ${m}\n\n`;
-		    out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
-		    out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
-		    out+=`Angle: 12 (use mirror)\n`;
-		    out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
-		    out+=`Clone distance: ${clone_distance}\n`;
-		    out+=`\n==========CHECK-DIMENSIONS==========\n`;
-		    out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
-		    out+=`Angled pieces: ${a_x} x ${a_y}`;
-	    } else{
-		    out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
-	    }
+                    out+='========RACK-INFO========\n';
+                    out+=`Module (teeth size): ${m}\n\n`;
+                    out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
+                    out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
+                    out+=`Angle: 12 (use mirror)\n`;
+                    out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
+                    out+=`Clone distance: ${clone_distance}\n`;
+                    out+=`\n==========CHECK-DIMENSIONS==========\n`;
+                    out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
+                    out+=`Angled pieces: ${a_x} x ${a_y}`;
+            } else{
+                    out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
+            }
 
       input('output').textContent=out;
       input('output').style.fontSize='16px';
@@ -563,8 +566,8 @@
 
     function planetary(){
       s = parseFloat(input("s").value);
-	    r = parseFloat(input("r").value);
-	    n_p = parseFloat(input("n_p").value);
+            r = parseFloat(input("r").value);
+            n_p = parseFloat(input("n_p").value);
 
       valid = (s < r && Math.round(s / n_p) - s / n_p === 0 && Math.round(r / n_p) - r / n_p === 0);
 
@@ -573,20 +576,20 @@
 
       R = (-r)/s
 
-	    f_c=(1/R) //carrier fixed
-	    out+="Carrier fixed:\n"
-	    out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
-	    out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
+            f_c=(1/R) //carrier fixed
+            out+="Carrier fixed:\n"
+            out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
+            out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
 
-	    f_s=(R-1)/R //sun fixed
-	    out+="Sun fixed:\n"
+            f_s=(R-1)/R //sun fixed
+            out+="Sun fixed:\n"
       out+=` -Carrier as input (outputs with ring): ${1/f_s} torque multiplication\n`                  
       out+=` -Ring as input (outputs with carrier): ${f_s} torque multiplication\n`
 
-	    f_r=(-1)*(R-1) //ring gear fixed
-	    out+="Ring fixed:\n"
+            f_r=(-1)*(R-1) //ring gear fixed
+            out+="Ring fixed:\n"
       out+=` -Sun as input (outputs with carrier): ${f_r} torque multiplication\n`                  
-    	out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
+        out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
 
       input('output').textContent=out;
       input('output').style.fontSize='16px';
