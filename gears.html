@@ -313,6 +313,10 @@
       valid = (m!=0 && m>0
       &&
       d!=0 && d>0
+      &&
+      d-2.4*m>=0.05
+      &&
+      ((d-2.4*m)*Math.tan(Math.PI/(360/q)))>=0.05
       );
 
       if (valid) {
@@ -375,6 +379,11 @@
         out+=`\n==========CHECK-DIMENSIONS==========\n`
         out+=`Center part: ${t_x} x ${t_y}\n`
         out+=`Spiral part: ${s_x} x ${s_y} x ${s_z}\n`
+      } else {
+        if (m==0 || m<0) {out=`ERROR: Invalid module (teeth size: ${m})`
+        } else if (d==0 || d<0) {out="ERROR: Invalid diameter"
+        } else if (d-2.4*m<0.05) {out=`ERROR: Bigger diameter or smaller module (inner diameter becomes ${round(d-2.4*m)})`
+        } else if (((d-2.4*m)*Math.tan(Math.PI/(360/q)))<0.05) {out=`ERROR: Bigger diameter, smaller module or more degree for rotating (circle piece dimension becomes ${round((d-2.4*m)*Math.tan(Math.PI/(360/q)))})`}
       }
 
       input('output').textContent=out;
