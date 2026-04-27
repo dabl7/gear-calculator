@@ -4,15 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Combined Gears Calculator BABFT</title>
+  <link rel="icon" href="./logo.png" type="image/png">
 </head>
 <body style=background-color:#707070>
   <h2>Combined Gears Calculator (for BABFT)</h2>
 
   <label>Mode:</label>
-    <button id="basic">Basic</button>
+    <button id="basic">Spur (basic)</button>
     <button id="worm">Worm</button>
     <button id="rack">Rack</button>
     <button id="planetary">Planetary</button>
+    <button id="bevel">Bevel</button>
   <br><br>
 
   <label id="basic1" style="display:none;">Gear type:
@@ -51,18 +53,32 @@
   </label>
   <br id="worm6" style="display:none;">
 
+  <label id="bevel1" style="display:none;">Radius 1 (studs): <input id="r1" type="number" step="any" value="30"></label>
+  <br id="bevel2" style="display:none;">
+  <label id="bevel3" style="display:none;">Radius 2 (studs): <input id="r2" type="number" step="any" value="10"></label>
+  <br id="bevel4" style="display:none;">
+  <label id="bevel5" style="display:none;">Teeth size (module): <input id="m_bevel" type="number" step="any" value="1"></label>
+  <br id="bevel6" style="display:none;">
+  <label id="bevel7" style="display:none;">Height percentage (0 to 35): <input id="k" type="number" step="any" value="25"></label>
+  <br id="bevel8" style="display:none;">
+  <label id="bevel9" style="display:none;">Shaft angle (0 to 180 degrees): <input id="a" type="number" step="any" value="90"></label>
+  <br id="bevel10" style="display:none;">
+
   <button id="calc_basic" style="display:none;">Calculate</button>
   <button id="calc_worm" style="display:none;">Calculate</button>
   <button id="calc_rack" style="display:none;">Calculate</button>
   <button id="calc_planetary" style="display:none;">Calculate</button>
+  <button id="calc_bevel" style="display:none;">Calculate</button>
 
   <pre style="font-size: 20px;font-weight: normal" id="output">(Choose a mode)</pre>
-  <br><pre style="font-size: 9px;">v1.0.1 (YouTube: @dabl2829)</pre>
+  <br><pre style="font-size: 9px;">v1.1.1 (YouTube: @dabl2829)</pre>
 
   <script>
-    //combined gears calculator (by @dabl2928 on youtube)            
+    //combined gears calculator (by @dabl2928 on youtube)
     //v1.0.0 - initial (2026 Jan 16)
     //v1.0.1 - added more worm gear checks for errors (2026 Jan 16)
+    //v1.1.0 - added bevel gears, changed text sizes (2026 Apr 22)
+    //v1.1.1 - added module recommender but only for bevel gears (2026 Apr 22)
 
     function round(n,d=2){p=Math.pow(10,d);return Math.round(n*p)/p;}
     function input(id){return document.getElementById(id);}
@@ -124,11 +140,11 @@
         out+=`Module (teeth size): ${m}\n\n`;
         
         if(odd) //ODDS
-                            if (t==='internal') {out+=`Inner radius: ${round(inner_d/2)} studs  (move for: ${round(AIS0)})\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
-                      else {out+=`Inner radius: ${round(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;}
-                    else //EVEN
-                            if (t==='internal') {out+=`Inner diameter: ${round(inner_d)} studs  (move for: ${AIS0} on both sides)\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
-                      else {out+=`Inner diameter: ${round(inner_d)} studs  (amount in scale: ${AIS0} for both sides)\n`;}
+			    if (t==='internal') {out+=`Inner radius: ${round(inner_d/2)} studs  (move for: ${round(AIS0)})\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+		      else {out+=`Inner radius: ${round(inner_d/2)} studs  (amount in scale: ${AIS0})\n`;}
+		    else //EVEN
+			    if (t==='internal') {out+=`Inner diameter: ${round(inner_d)} studs  (move for: ${AIS0} on both sides)\nOuter diameter: ${round(outer_d)} studs\nThickness: ${round(thickness)} studs  (amount in scale: ${round(thickness-2)})\n`;}
+		      else {out+=`Inner diameter: ${round(inner_d)} studs  (amount in scale: ${AIS0} for both sides)\n`;}
 
         out+=`Circle piece: ${circle_piece}  (amount in scale: ${AIS1})\n`;
         out+=`Tooth length: ${tooth_arc_length}  (amount in scale: ${AIS2})\n`;
@@ -140,15 +156,15 @@
         out+=`\nTooth part dimensions: ${round(2+2*AIS2)} x ${tooth_height}\n`;
 
         if(odd)
-                if (t===`internal`)
-                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
-                else
-                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d/2}\n`}
+	        if (t===`internal`)
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
+	        else
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d/2}\n`}
         else
-                if (t==='internal')
+	        if (t==='internal')
             {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${thickness}\n`}
-                else
-                        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d}\n`}
+	        else
+		        {out+=`Other part dimensions: ${round(2+2*AIS1)} x ${inner_d}\n`}
 
         if(odd)out+='\nWARNING: gear has an odd number of teeth (add another large part for cloning and rotating)';
       } else {
@@ -159,7 +175,7 @@
       }
 
       input('output').textContent=out;
-      input('output').style.fontSize='20px';
+      input('output').style.fontSize='16px';
       input('output').style.fontWeight='normal';
     }
 
@@ -191,10 +207,22 @@
       input('planet5').style.display='none';
       input('planet6').style.display='none';
 
+      input('bevel1').style.display='none';
+      input('bevel2').style.display='none';
+      input('bevel3').style.display='none';
+      input('bevel4').style.display='none';
+      input('bevel5').style.display='none';
+      input('bevel6').style.display='none';
+      input('bevel7').style.display='none';
+      input('bevel8').style.display='none';
+      input('bevel9').style.display='none';
+      input('bevel10').style.display='none';
+
       input('calc_basic').style.display='';
       input('calc_worm').style.display='none';
       input('calc_rack').style.display='none';
       input('calc_planetary').style.display='none';
+      input('calc_bevel').style.display='none';
 
       asciiexternal();
     }
@@ -393,7 +421,7 @@
       }
 
       input('output').textContent=out;
-      input('output').style.fontSize='20px';
+      input('output').style.fontSize='16px';
       input('output').style.fontWeight='normal';
     }
     function worminputs(){
@@ -423,10 +451,22 @@
       input('planet5').style.display='none';
       input('planet6').style.display='none';
 
+      input('bevel1').style.display='none';
+      input('bevel2').style.display='none';
+      input('bevel3').style.display='none';
+      input('bevel4').style.display='none';
+      input('bevel5').style.display='none';
+      input('bevel6').style.display='none';
+      input('bevel7').style.display='none';
+      input('bevel8').style.display='none';
+      input('bevel9').style.display='none';
+      input('bevel10').style.display='none';
+
       input('calc_basic').style.display='none';
       input('calc_worm').style.display='';
       input('calc_rack').style.display='none';
       input('calc_planetary').style.display='none';
+      input('calc_bevel').style.display='none';
 
       a='\n'
       a+='  .........               .........               .........               .........               ........\n'
@@ -476,34 +516,34 @@
       valid = (m != 0 && m>0);
 
       clone_distance=round(m*pi);
-            tooth_height = round(2.2*m);
-            tooth_arc_length = round(1.1*m);
-            slope_length = round(tooth_height/Math.cos(12*pi/180));
+	    tooth_height = round(2.2*m);
+	    tooth_arc_length = round(1.1*m);
+	    slope_length = round(tooth_height/Math.cos(12*pi/180));
 
       AIS0 = round(tooth_height-2);
-            AIS1 = round(tooth_arc_length/2-1);
-            AIS2 = round(slope_length-tooth_height);
+	    AIS1 = round(tooth_arc_length/2-1);
+	    AIS2 = round(slope_length-tooth_height);
 
       p_x = round(2+2*AIS1);
-            p_y = round(2+AIS0);
-            a_x = round(p_x);
-            a_y = round(p_y+AIS2);
+	    p_y = round(2+AIS0);
+	    a_x = round(p_x);
+	    a_y = round(p_y+AIS2);
 
       out=''
       if (valid){
-                    out+='========RACK-INFO========\n';
-                    out+=`Module (teeth size): ${m}\n\n`;
-                    out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
-                    out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
-                    out+=`Angle: 12 (use mirror)\n`;
-                    out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
-                    out+=`Clone distance: ${clone_distance}\n`;
-                    out+=`\n==========CHECK-DIMENSIONS==========\n`;
-                    out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
-                    out+=`Angled pieces: ${a_x} x ${a_y}`;
-            } else{
-                    out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
-            }
+		    out+='========RACK-INFO========\n';
+		    out+=`Module (teeth size): ${m}\n\n`;
+		    out+=`Tooth height: ${tooth_height} (amount in scale: ${AIS0})\n`;
+		    out+=`Tooth length: ${tooth_arc_length} (amount in scale: ${AIS1})\n`;
+		    out+=`Angle: 12 (use mirror)\n`;
+		    out+=`Slope length: ${slope_length} (amount in scale: ${AIS2})\n\n`;
+		    out+=`Clone distance: ${clone_distance}\n`;
+		    out+=`\n==========CHECK-DIMENSIONS==========\n`;
+		    out+=`Perpendicular piece: ${p_x} x ${p_y}\n`;
+		    out+=`Angled pieces: ${a_x} x ${a_y}`;
+	    } else{
+		    out+=`ERROR: not a valid tooth size (cant be negative or zero) (module: ${m})`
+	    }
 
       input('output').textContent=out;
       input('output').style.fontSize='16px';
@@ -536,10 +576,22 @@
       input('planet5').style.display='none';
       input('planet6').style.display='none';
 
+      input('bevel1').style.display='none';
+      input('bevel2').style.display='none';
+      input('bevel3').style.display='none';
+      input('bevel4').style.display='none';
+      input('bevel5').style.display='none';
+      input('bevel6').style.display='none';
+      input('bevel7').style.display='none';
+      input('bevel8').style.display='none';
+      input('bevel9').style.display='none';
+      input('bevel10').style.display='none';
+
       input('calc_basic').style.display='none';
       input('calc_worm').style.display='none';
       input('calc_rack').style.display='';
       input('calc_planetary').style.display='none';
+      input('calc_bevel').style.display='none';
 
 
       a='\n'
@@ -569,8 +621,8 @@
 
     function planetary(){
       s = parseFloat(input("s").value);
-            r = parseFloat(input("r").value);
-            n_p = parseFloat(input("n_p").value);
+	    r = parseFloat(input("r").value);
+	    n_p = parseFloat(input("n_p").value);
 
       valid = (s < r && Math.round(s / n_p) - s / n_p === 0 && Math.round(r / n_p) - r / n_p === 0);
 
@@ -579,20 +631,20 @@
 
       R = (-r)/s
 
-            f_c=(1/R) //carrier fixed
-            out+="Carrier fixed:\n"
-            out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
-            out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
+	    f_c=(1/R) //carrier fixed
+	    out+="Carrier fixed:\n"
+	    out+=` -Sun as input (outputs with ring): ${1/f_c} torque multiplication (reversed)\n`
+	    out+=` -Ring as input (outputs with sun): ${f_c} torque multiplication (reversed)\n`
 
-            f_s=(R-1)/R //sun fixed
-            out+="Sun fixed:\n"
+	    f_s=(R-1)/R //sun fixed
+	    out+="Sun fixed:\n"
       out+=` -Carrier as input (outputs with ring): ${1/f_s} torque multiplication\n`                  
       out+=` -Ring as input (outputs with carrier): ${f_s} torque multiplication\n`
 
-            f_r=(-1)*(R-1) //ring gear fixed
-            out+="Ring fixed:\n"
+	    f_r=(-1)*(R-1) //ring gear fixed
+	    out+="Ring fixed:\n"
       out+=` -Sun as input (outputs with carrier): ${f_r} torque multiplication\n`                  
-        out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
+    	out+=` -Carrier as input (outputs with sun): ${1/f_r} torque multiplication\n`
 
       input('output').textContent=out;
       input('output').style.fontSize='16px';
@@ -625,10 +677,22 @@
       input('planet5').style.display='';
       input('planet6').style.display='';
 
+      input('bevel1').style.display='none';
+      input('bevel2').style.display='none';
+      input('bevel3').style.display='none';
+      input('bevel4').style.display='none';
+      input('bevel5').style.display='none';
+      input('bevel6').style.display='none';
+      input('bevel7').style.display='none';
+      input('bevel8').style.display='none';
+      input('bevel9').style.display='none';
+      input('bevel10').style.display='none';
+
       input('calc_basic').style.display='none';
       input('calc_worm').style.display='none';
       input('calc_rack').style.display='none';
       input('calc_planetary').style.display='';
+      input('calc_bevel').style.display='none';
 
       a='\n'
       a+='                                                       ......~.....\n'
@@ -689,15 +753,364 @@
       input('output').style.fontWeight='bold';
     }
 
+    function bevel(){
+      r1=parseFloat(input("r1").value);
+      r2=parseFloat(input("r2").value);
+      m=parseFloat(input("m_bevel").value);
+      k=parseFloat(input("k").value)/100; //100% would be a full cone
+      a=parseFloat(input("a").value);
+
+      ratio=r1/r2;
+
+      pi=Math.PI;
+
+      dp1=r1*2 //planning cone diameter
+      dp2=r2*2
+      hp1=(r2-Math.cos((180-a)*pi/180)*r1)/(Math.cos((90-a)*pi/180)) //planning cone height (the entire bevel calculator depends on this)
+      hp2=(r1-Math.cos((180-a)*pi/180)*r2)/(Math.cos((90-a)*pi/180))
+      hyp=Math.hypot(r1,hp1) //planning cone hypotenuse, same for both
+      angle1=Math.atan(hp1/r1)*180/pi //planning cone angle (at the thin edge, not the apex)
+      angle2=Math.atan(hp2/r2)*180/pi
+
+      dangle=Math.atan((1.2*m)/(Math.hypot(hp1,r1)))*180/pi 
+
+      n1=Math.round(dp1/m) //number of teeth
+      n2=Math.round(dp2/m)
+      deg1=round(360/n1,2) //degrees for rotating
+      deg2=round(360/n2,2)
+      odd1=n1%2; //True if odd
+      odd2=n2%2;
+
+      hb1=round(m*n2/8); //base height, equal to how much you have to move back hinges
+      hb2=round(m*n1/8);
+
+      da1=dp1-2*Math.sin((angle1)*pi/180)*(1.2*m); //widest physical part (where teeth start)
+      da2=dp2-2*Math.sin((angle2)*pi/180)*(1.2*m);
+      dtop1=da1*(1-k); //top diameter (after only trimming)
+      dtop2=da2*(1-k);
+      daa1=round(da1*(1-k)/2,2)*2; //top diameter (after trimming)
+      daa2=round(da2*(1-k)/2,2)*2;
+      la1=round(hyp*k/Math.cos(dangle*pi/180),2); //part length (root hypotenuse)
+      la2=round(hyp*k/Math.cos(dangle*pi/180),2);
+      ta1=round(1.5*m,2); //could be improved, kind of guessed now
+      ta2=round(1.5*m,2);
+      ca1=round(daa1*Math.tan(pi/n1)/2,2)*2; //circle piece angled piece
+      ca2=round(daa2*Math.tan(pi/n2)/2,2)*2;
+
+      ht1=round(hp1*k-Math.sin((a-angle1)*pi/180)*1.2*m*(1-k)+hb1,2); //height of the upper cylinder
+      ht2=round(hp2*k-Math.sin((a-angle2)*pi/180)*1.2*m*(1-k)+hb2,2);
+      ct1=round(daa1*Math.tan(pi/n1)/2,2)*2; //circle piece of the upper cylinder
+      ct2=round(daa2*Math.tan(pi/n2)/2,2)*2;
+
+      di1=dp1/Math.cos(deg1*pi/180); //imaginary diameter
+      di2=dp1/Math.cos(deg2*pi/180);
+      ni1=round(di1/m); //imaginary number of teeth
+      ni2=round(di2/m);
+
+      if (ni1<=5){g1=0.6} //these are the top of the tooth values at the end of the involute curve (taken from pressure angle 12)
+      else if (ni1<=7){g1=0.7}
+      else if (ni1<=12){g1=0.8}
+      else if (ni1<=22){g1=0.9}
+      else if (ni1<=57){g1=1}
+      else {g1=1.1};
+        
+      if (ni2<=5){g2=0.6}
+      else if (ni2<=7){g2=0.7}
+      else if (ni2<=12){g2=0.8}
+      else if (ni2<=22){g2=0.9}
+      else if (ni2<=57){g2=1}
+      else {g2=1.1};
+        
+      tarc1=round(m*g1*(1-k)/2,2)*2; //tooth arc length
+      tarc2=round(m*g2*(1-k)/2,2)*2;
+      corr1=Math.hypot(daa1/2,ct1/2)-dtop1/2;
+      corr2=Math.hypot(daa2/2,ct2/2)-dtop2/2; //correction value (takes into account the longer diagonal on the n-gon from other gear)
+      th=2.2*m;
+      th1=round(2.2*m-corr1,2); //corrected tooth height
+      th2=round(2.2*m-corr2,2);
+        
+      v1=hyp/Math.cos(dangle*pi/180)*k*Math.sin((angle1+dangle)*pi/180);
+      v2=hyp/Math.cos(dangle*pi/180)*k*Math.sin((angle2+dangle)*pi/180);
+      h1=(da1-dtop1)/2;
+      h2=(da2-dtop2)/2;
+      tilt1=Math.atan(v1/h1)*180/pi;
+      tilt2=Math.atan(v2/h2)*180/pi;
+      align=Math.atan(th*k/la1)*180/pi; //how much to angle teeth so that it meets at the same point
+        
+      u1=[daa1,ht1,ct1]; //dimensions table for upper part
+      u2=[daa2,ht2,ct2]; //d, height, circle piece
+        
+      a1=[la1,ta1,ca1]; //dimensions table for angled part
+      a2=[la2,ta2,ca2]; //hyp, thickness, circle piece
+        
+      t1=[la1,th1,tarc1]; //dimensions table for tooth part
+      t2=[la2,th2,tarc2]; //hyp, height, arc length
+
+      valid=(r1>0.05 &&
+      r2>0.05 &&
+      a>0 &&
+      a<180 &&
+      k>0 &&
+      k<=0.35 &&
+      m>0 &&
+      hp1>0.05 &&
+      hp2>0.05 &&
+      dp1%m<0.1 && //allows a very small tolerance for teeth (shouldnt cause problems)
+      dp2%m<0.1 &&
+      n1>=6 &&
+      n2>=6 &&
+      odd1==false &&
+      //no support for odd number of teeth
+      //-
+      //(just double the number of teeth and problem solved mi hermano, in case youre disabling
+      //this limit then just make sure to not build the entire slice but only half of it and then
+      //rotate that around the axis, you will need to add another part so that the center of
+      //rotating is at the axis where it should be)
+      odd2==false &&
+      u1[0]>=0.05 &&
+      u1[1]>=0.05 &&
+      u1[2]>=0.05 &&
+      u2[0]>=0.05 &&
+      u2[1]>=0.05 &&
+      u2[2]>=0.05 &&
+      a1[0]>=0.05 &&
+      a1[1]>=0.05 && //cant make parts smaller than 0.05
+      a1[2]>=0.05 &&
+      a2[0]>=0.05 &&
+      a2[1]>=0.05 &&
+      a2[2]>=0.05 &&
+      t1[0]>=0.05 &&
+      t1[1]>=0.05 &&
+      t1[2]>=0.05 &&
+      t2[0]>=0.05 &&
+      t2[1]>=0.05 &&
+      t2[2]>=0.05
+      );
+
+      if (valid) {        
+        upart1=Math.ceil(u1[0]*u1[1]*u1[2]/8);
+        if (upart1<1) {upart1=1};
+        upart2=Math.ceil(u2[0]*u2[1]*u2[2]/8);
+        if (upart2<1) {upart2=1};
+        
+        apart1=Math.ceil(a1[0]*a1[1]*a1[2]/8);
+        if (apart1<1) {apart1=1};
+        apart2=Math.ceil(a2[0]*a2[1]*a2[2]/8);
+        if (apart2<1) {apart2=1};
+        
+        tpart1=Math.ceil(t1[0]*t1[1]*t1[2]/8);
+        if (tpart1<1) {tpart1=1};
+        tpart2=Math.ceil(t2[0]*t2[1]*t2[2]/8);
+        if (tpart2<1) {tpart2=1};
+        
+        slice1=upart1+apart1*2+tpart1*2; //how many blocks one "slice" has (before cloning and rotating)
+        slice2=upart2+apart2*2+tpart2*2;
+        ab1=n1*slice1/2; //number of blocks
+        ab2=n2*slice2/2;
+        
+        out=`=============================BEVEL-PAIR-INFO==============================\n`;
+        out+=`Module: ${round(m)}\n`;
+        out+=`First gear: ${round(ab1)} blocks (${n1} teeth)\n`;
+        out+=`Second gear: ${round(ab2)} blocks (${n2} teeth)\n`;
+        out+=`Height percentage: ${round(k)}\n`;
+        out+=`Gear ratio: ${round(ratio)} or ${round(1/ratio)}\n`;
+        out+=`Teeth: ${n1} to ${n2}\n\n\n`;
+        
+        out+=`================================FIRST-GEAR================================\n`;
+        out+=` 1. Number of teeth: ${round(n1)}\n`;
+        out+=` 1. Planning diameter: ${round(dp1)}\n\n`;
+        
+        out+=` 1. Move hinge/wheel back for ${round(hb1)}\n`;
+        out+=` 1. Top diameter: ${round(u1[0])} (amount in scale: ${round(u1[0]/2-1)}, both sides)\n`;
+        out+=` 1. Top thickness: ${round(u1[1])} (amount in scale: ${round(u1[1]-2)})\n`;
+        out+=` 1. Top circle piece: ${round(u1[2])} (amount in scale: ${round(u1[2]/2-1)}, both sides)\n\n`;
+        
+        out+=` 1. Mirror 2x and angle ${round(tilt1)} degrees on corner\n`;
+        out+=` 1. Slope length: ${round(a1[0])} (amount in scale: ${round(a1[0]-u1[0])})\n`; //or 4x mirror
+        out+=` 1. Slope depth: ${round(a1[1])} (amount in scale: ${round(a1[1]-u1[1])})\n\n`;
+        
+        out+=` 1. Mirror slope 2x and angle ${round(align)} degrees on outer corner\n`;
+        out+=` 1. Tooth height: ${round(t1[1])} (amount in scale: ${round(t1[1]-a1[1])})\n`;
+        out+=` 1. Tooth width: ${round(t1[2])} (amount in scale: ${round((t1[2]-a1[2])/2)}, both sides)\n\n`;
+        
+        out+=` 1. Degrees for rotating and cloning: ${round(deg1)}\n\n`;
+        
+        out+=`===FIRST-GEAR-DIMENSIONS===\n`;
+        out+=`1. Top part: ${round(u1[0])} x ${round(u1[1])} x ${round(u1[2])}\n`;
+        out+=`1. Angled part: ${round(a1[0])} x ${round(a1[1])} x ${round(a1[2])}\n`;
+        out+=`1. Tooth part: ${round(t1[0])} x ${round(t1[1])} x ${round(t1[2])}\n\n\n`;
+
+
+        out+=`================================SECOND-GEAR================================\n`;
+        out+=` 2. Number of teeth: ${round(n2)}\n`;
+        out+=` 2. Planning diameter: ${round(dp2)}\n\n`;
+        
+        out+=` 2. Move hinge/wheel back for ${round(hb2)}\n`;
+        out+=` 2. Top diameter: ${round(u2[0])} (amount in scale: ${round(u2[0]/2-1)}, both sides)\n`;
+        out+=` 2. Top thickness: ${round(u2[1])} (amount in scale: ${round(u2[1]-2)})\n`;
+        out+=` 2. Top circle piece: ${round(u2[2])} (amount in scale: ${round(u2[2]/2-1)}, both sides)\n\n`;
+        
+        out+=` 2. Mirror 2x and angle ${round(tilt2)} degrees on corner\n`;
+        out+=` 2. Slope length: ${round(a2[0])} (amount in scale: ${round(a2[0]-u2[0])})\n`; //or 4x mirror
+        out+=` 2. Slope depth: ${round(a2[1])} (amount in scale: ${round(a2[1]-u2[1])})\n\n`;
+        
+        out+=` 2. Mirror slope 2x and angle ${round(align)} degrees on outer corner\n`;
+        out+=` 2. Tooth height: ${round(t2[1])} (amount in scale: ${round(t2[1]-a2[1])})\n`;
+        out+=` 2. Tooth width: ${round(t2[2])} (amount in scale: ${round((t2[2]-a2[2])/2)}, both sides)\n\n`;
+        
+        out+=` 2. Degrees for rotating and cloning: ${round(deg2)}\n\n`;
+        
+        out+=`===SECOND-GEAR-DIMENSIONS===\n`;
+        out+=`2. Top part: ${round(u2[0])} x ${round(u2[1])} x ${round(u2[2])}\n`;
+        out+=`2. Angled part: ${round(a2[0])} x ${round(a2[1])} x ${round(a2[2])}\n`;
+        out+=`2. Tooth part: ${round(t2[0])} x ${round(t2[1])} x ${round(t2[2])}\n\n\n`;
+      } else {
+        if (a<=0 || a>=180) {out=`ERROR: Incorrect shaft angle (${a})`;
+        } else if (dp1%m>=0.1 || dp2%m>=0.1 || m<=0 || n1<6 || n2<6) {
+          out=`ERROR: Incorrect module (not a full number or less than 6 teeth: ${round(dp1/m)} and ${round(dp2/m)} teeth)\n\n`;
+          out+=`List of modules that would work (choose any):\n`;
+          for (n=6;n<500;n+=2) {
+            mn=Math.min(dp1,dp2)/n; //checks situations all the way to 500 teeth to find suitable modules
+
+            tn1=Math.round(dp1/mn); //number of teeth
+            tn2=Math.round(dp2/mn);
+
+            todd1=tn1%2; //true if odd
+            todd2=tn2%2;
+
+            thick=round(mn*1.1*(1-k)/2)*2;
+            thick>=0.06; //tooth thickness has to be atleast 0.06
+
+            nicenumber=(round(mn,4)==mn); //nice number means it has 4 decimal places max
+
+            if (!todd1 && !todd2 && dp1%mn<0.1 && dp2%mn<0.1 && thick && nicenumber) { //only if not odd, less than 0.1 when diameter/module, tooth thick enough, 2 decimals
+              out+=` -module: ${mn}\n`;
+            }
+          }
+        } else if (hp1<0 || hp2<0) {out=`ERROR: Not possible to make, cone's height goes negative, reduce shaft angle or change radii\n(calculated: ${round(hp1)}, ${round(hp2)})`;
+        } else if (r1<0.05) {out=`ERROR: Invalid radius1 (smaller than 0.05: ${r1})`;
+        } else if (r2<0.05) {out=`ERROR: Invalid radius2 (smaller than 0.05: ${r2})`;
+        } else if (k<=0 || k>0.35) {out=`ERROR: Invalid height percentage`
+        } else if (odd1 || odd2) {
+          out=`ERROR: Odd number of teeth on first gear\n`;
+          out+=`(not supported, because i think its almost useless since you can\n`;
+          out+=`just halve the module and get double the teeth with the same ratio)\n\n`;
+          out+=`Module ${m/2} will work (teeth will double)`;
+        } else if (u1[0]<0.05 || u1[1]<0.05 || u1[2]<0.05 || u2[0]<0.05 || u2[1]<0.05 || u2[2]<0.05 || a1[0]<0.05 || a1[1]<0.05 || a1[2]<0.05 || a2[0]<0.05 || a2[1]<0.05 || a2[2]<0.05 || t1[0]<0.05 || t1[1]<0.05 || t1[2]<0.05 || t2[0]<0.05 || t2[1]<0.05 || t2[2]<0.05) {
+          out=`ERROR: one of the parts' dimensions' get smaller than 0.05 (impossible to make)\n`;
+          out+=` increasing the module or height percentage or diameter will fix this`
+        } else {out=`ERROR: Unknown (comment which values you used and I will fix it)`;};
+      };
+
+      input('output').textContent=out;
+      input('output').style.fontSize='16px';
+      input('output').style.fontWeight='normal';
+    }
+    function bevelinputs(){
+      input('basic1').style.display='none';
+      input('basic2').style.display='none';
+      input('basic3').style.display='none';
+      input('basic4').style.display='none';
+      input('basic5').style.display='none';
+      input('basic6').style.display='none';
+      input('basic7').style.display='none';
+      input('thickness-label').style.display='none';
+
+      input('worm1').style.display='none';
+      input('worm2').style.display='none';
+      input('worm3').style.display='none';
+      input('worm4').style.display='none';
+      input('worm5').style.display='none';
+      input('worm6').style.display='none';
+
+      input('rack1').style.display='none';
+      input('rack2').style.display='none';
+
+      input('planet1').style.display='none';
+      input('planet2').style.display='none';
+      input('planet3').style.display='none';
+      input('planet4').style.display='none';
+      input('planet5').style.display='none';
+      input('planet6').style.display='none';
+
+      input('bevel1').style.display='';
+      input('bevel2').style.display='';
+      input('bevel3').style.display='';
+      input('bevel4').style.display='';
+      input('bevel5').style.display='';
+      input('bevel6').style.display='';
+      input('bevel7').style.display='';
+      input('bevel8').style.display='';
+      input('bevel9').style.display='';
+      input('bevel10').style.display='';
+
+      input('calc_basic').style.display='none';
+      input('calc_worm').style.display='none';
+      input('calc_rack').style.display='none';
+      input('calc_planetary').style.display='none';
+      input('calc_bevel').style.display='';
+
+      a='\n'
+      a+='                                                                                                                                                .:+\n'
+      a+='                                                                                                                                              .+ooo\n'
+      a+='                                                                                                                                            :+ooooo.\n'
+      a+='                                                                                                                                         .:ooooooo+\n'
+      a+='                                                                                                                                       ~+ooooo+++::\n'
+      a+='                                                                                                                                    .:oooo+++:::::+.\n'
+      a+='                                                                                                                                 ..+oo++::::::+++o+\n'
+      a+='                                                                                                                               .~++++:::::+++oooooo\n'
+      a+='                                                                                                                             .:++:::::+++ooooooooo+\n'
+      a+='                                                                                                                         ..~~:+:::+++oooooooooooooo.\n'
+      a+='                                                                                                                      .~~::+::+++ooooooooooooooooo+\n'
+      a+='                                                                                                                     .+:::+++ooooooooooooooo+++++::......~\n'
+      a+='                                                                                                                     .+++ooooooooooo+++++::::::+++++o+++o+.\n'
+      a+='                                                                                                                     :oooooo+++++::::::++++o+oooooo+++++++.\n'
+      a+='                                                                                                                     ~+++::::::+++++ooooooooooooooo+++++++\n'
+      a+='                                                                                                                     .+:++++ooooooooooooooooooooooo+++++++.\n'
+      a+='                                                                                                                     ~ooooooooooooooooooooooooooooo+++++++\n'
+      a+='                                                                                                                     ~++++++++++++++++++++++++++++++++++++.\n'
+      a+='                                                                                                                     .+:::::::::::::::::::::::::::++++++++.\n'
+      a+='                                                                                                                     ~oooooooooooooooooooooooooooo++++++++\n'
+      a+='                                                                                                                     ~++ooooooooooooooooooooooooooo+++++++.\n'
+      a+='                                                                                                                     ~+::::+++++ooooooooooooooooooo+++++++\n'
+      a+='                                                                                                                     ~oo+++++::::::+++++ooooooooooo+++++++.\n'
+      a+='                                                                                                                     ~+ooooooooo+++++::::::+++++ooo+++++++.\n'
+      a+='                                                                                                                     .:::++ooooooooooooo++++++:::::+:+:++:.\n'
+      a+='                                 .~~~~~~~~~:~~.....~~~~.....~~~~...~~~~~...~~~~....~~~~.....~~~.....~~~~~~.~~~~~~.   .:::::::++oooooooooooooooooo++\n'
+      a+='                              .:+ooooooooooo+++++ooooo++::+ooooo+:+ooooo::+ooooo::+ooooo++:++ooooo++:++ooooooooooo+..  ..~::+::::++ooooooooooooooo+\n'
+      a+='                            .:ooooooooooo+:::++ooooo+:::+oooooo+::+ooooo::+ooooo+::+ooooo++:::+ooooo++::++oooooooooo+~.     .:++::::+++oooooooooooo.\n'
+      a+='                          .+oooooooooo+:::++oooooo++::++ooooooo::+oooooo::+oooooo::+ooooooo+:::+ooooooo++::++oooooooooo:.     .~+++::~::+++ooooooo+\n'
+      a+='                        ~+ooooooooo++:::+ooooooo++:::+oooooooo+::ooooooo::+oooooo+::+oooooooo+:::+oooooooo++::+oooooooooo+.      ~+oo++::::::++oooo\n'
+      a+='                     .:ooooooooo++:::+ooooooooo+:::+ooooooooo+::+ooooooo::+ooooooo+::oooooooooo+:::+ooooooooo+:::+oooooooooo~      .:ooo+++:::::+++\n'
+      a+='                   .+ooooooooo+:::+oooooooooo+:::+ooooooooooo:::oooooooo::+oooooooo::+oooooooooo+:::++oooooooooo+:::+ooooooooo:.      ~+oooo+++::::.\n'
+      a+='                 .+oooooooo++::+oooooooooooo+:::+ooooooooooo+::+oooooooo::+oooooooo+::+ooooooooooo+:::+ooooooooooo++::++oooooooo+.      .+oooooo++:\n'
+      a+='              .~+ooooooo+:::++oooooooooooo+:::+ooooooooooooo::+ooooooooo+:+ooooooooo:::ooooooooooooo+:::+oooooooooooo++::++ooooooo+~      .:+oooooo\n'
+      a+='            .:ooooooo++::++ooooooooooooo+:::+oooooooooooooo+::ooooooooo+::+ooooooooo+::+ooooooooooooo++:::+ooooooooooooo+:::+oooooooo~.      .+ooo+\n'
+      a+='          .+oooooo++::++oooooooooooooo++:::+oooooooooooooo+::+oooooooooo::+oooooooooo+::ooooooooooooooo+:::+ooooooooooooooo+:::+ooooooo:.      .:oo.\n'
+      a+='       .~+oooooo+::++oooooooooooooooo+:::+oooooooooooooooo+::ooooooooooo::+ooooooooooo::+oooooooooooooooo+:::+ooooooooooooooo++:::+oooooo+.       ~\n'
+      a+='     .:+ooooo+:::+ooooooooooooooooo+:::+ooooooooooooooooo+::+ooooooooooo::+ooooooooooo+::+ooooooooooooooooo::::+oooooooooooooooo++::++ooooo+~\n'
+      a+='   .+ooooo+:::++ooooooooooooooooo++::++oooooooooooooooooo::+oooooooooooo::+oooooooooooo::+oooooooooooooooooo+:::+oooooooooooooooooo++::++ooooo:.\n'
+      a+=' ~+ooooo+::+oooooooooooooooooooo+:+++ooooooooooooooooooo+::ooooooooooooo::+oooooooooooo+::+ooooooooooooooooooo+:::+ooooooooooooooooooo++:++ooooo+~\n'
+      a+='...........................................~+++++++++++++++++++++++++++++++++++++++++++++++++o+++++++o+...........................................\n'
+      a+='                                            ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++:\n'
+      a+='                                           .+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n'
+      a+='                                            ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++:\n'
+      input('output').textContent=a;
+      input('output').style.fontSize='4px';
+      input('output').style.fontWeight='bold';
+    }
+
     input("basic").onclick=basicinputs;
     input("worm").onclick=worminputs;
     input("rack").onclick=rackinputs;
     input("planetary").onclick=planetaryinputs;
+    input("bevel").onclick=bevelinputs;
 
     input("calc_basic").onclick=basic;
     input("calc_worm").onclick=worm;
     input("calc_rack").onclick=rack;
     input("calc_planetary").onclick=planetary;
+    input("calc_bevel").onclick=bevel;
 
     input('type').onchange=e=>{
       input('thickness-label').style.display=e.target.value==='internal'?'block':'none';
