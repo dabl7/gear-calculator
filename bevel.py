@@ -9,7 +9,31 @@ r2=float(input("Radius2 [studs]: "))
 m=float(input("Module: "))
 k=float(input("Height percentage [0 to 25]: "))/100 #100% would be a full cone
 a=float(input("Angle between the shafts [0 to 180 deg]: "))
-bevel(r1,r2,m,k,a)
+
+def ASCIIbevel():
+    a='\n'
+    a+='                                                                     :.\n'
+    a+='                                                                  ~+oo~\n'
+    a+='                                                                :+o+++.\n'
+    a+='                                                             .:++++++o~\n'
+    a+='                                                           .:++++ooooo~\n'
+    a+='                                                        ~+++oooooo++++~...\n'
+    a+='                                                        +o+++++++++++oo+o+\n'
+    a+='                                                        +++o+ooooooooo++++\n'
+    a+='                                                        :+++++++++++++++++\n'
+    a+='                                                        ++++oooooooo+o++++\n'
+    a+='                                                        +++++++++oooooo+++\n'
+    a+='                                                        :ooooo+++++++++:+:\n'
+    a+='              ~+++++:::+++~:++::++::++~+++:~+++::+++++:   ~:+++ooooooo.\n'
+    a+='            :ooooo+++ooo++oooo:ooo++oo++ooo+++ooo+++oooo+.   :+++++ooo~\n'
+    a+='         .:ooo++++oooo::+oooo:+ooo:+ooo:+oooo+:+ooo++++ooo+:   :++++:+.\n'
+    a+='       ~+ooo++++oooo+:+ooooo+:oooo++oooo:oooooo+++oooo++++ooo+   ~+oo+.\n'
+    a+='     :ooo+++oooooo+:+ooooooo:ooooo:+oooo++oooooo+:+oooooo++++oo+~   :o~\n'
+    a+='  .+oo++++ooooooo:+oooooooo++ooooo:+ooooo:+ooooooo+:+ooooooo++++oo:\n'
+    a+='~+oo+++oooooooo+:+oooooooo+:oooooo:+ooooo+:ooooooooo+:+oooooooo+++oo+\n'
+    a+='                    ~o++++++o++o+++++o+++++++++++\n'
+    a+='                     +::::+::::::::+:::+:+:+:+:+:\n'
+    print(a)
 
 def bevel(r1,r2,m,k,a):
     ASCIIbevel()
@@ -241,3 +265,5 @@ def bevel(r1,r2,m,k,a):
         else:
             out=f"ERROR: Unknown (comment which values you used and I will fix it)"
     print(out)
+
+bevel(r1,r2,m,k,a)
