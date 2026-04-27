@@ -241,7 +241,7 @@ def bevel(r1,r2,m,k,a):
     n1=round(dp1/m,2) #number of teeth
     n2=round(dp2/m,2)
     if n1==0 or n2==0:
-        print(f"ERROR: Module too small")
+        print(f"ERROR: Module too big")
         exit()
 
     deg1=round(360/n1,2) #degrees for rotating
