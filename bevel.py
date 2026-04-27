@@ -7,7 +7,7 @@ import math
 r1=float(input("Radius1 [studs]: "))
 r2=float(input("Radius2 [studs]: "))
 m=float(input("Module: "))
-k=float(input("Height percentage [0 to 25]: "))/100 #100% would be a full cone
+k=float(input("Height percentage [0 to 35]: "))/100 #100% would be a full cone
 a=float(input("Angle between the shafts [0 to 180 deg]: "))
 
 def ASCIIbevel():
